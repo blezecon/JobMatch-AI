@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Heading } from "@/components/Feedback";
 import { saveJobs } from "@/lib/store";
+import { cn } from "@/lib/utils";
 import type { Job, JobsResponse } from "@/types";
 
 type SearchState =
@@ -120,8 +121,9 @@ export function JobSearch() {
               </NativeSelect>
             </Field>
           </CardContent>
-          <CardFooter>
-            <Button type="submit" disabled={state.status === "loading"}>
+          {/* Breathing room so the hover translate does not touch the location field. */}
+          <CardFooter className="pt-4">
+            <Button type="submit" className="w-full sm:w-auto" disabled={state.status === "loading"}>
               {state.status === "loading" ? "Searching…" : "Search jobs"}
             </Button>
           </CardFooter>
@@ -181,15 +183,18 @@ export function JobSearch() {
                     {job.description.length > 320 ? "…" : ""}
                   </p>
                 </CardContent>
-                <CardFooter className="flex-wrap gap-2">
-                  <Button onClick={() => router.push(`/analyze/${encodeURIComponent(job.id)}`)}>
+                <CardFooter className="flex-wrap gap-x-3 gap-y-4 pt-4">
+                  <Button
+                    className="w-full sm:w-auto"
+                    onClick={() => router.push(`/analyze/${encodeURIComponent(job.id)}`)}
+                  >
                     Analyze match
                   </Button>
                   <a
                     href={job.url}
                     target="_blank"
                     rel="noreferrer noopener"
-                    className={buttonVariants({ variant: "neutral" })}
+                    className={cn(buttonVariants({ variant: "neutral" }), "w-full sm:w-auto")}
                   >
                     Apply on {job.source} ↗
                   </a>

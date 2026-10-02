@@ -161,7 +161,7 @@ export function MatchReport({ jobId }: { jobId: string }) {
             </Alert>
           )}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="pt-4">
           <a
             href={job.url}
             target="_blank"

@@ -105,8 +105,10 @@ export function ResumeUpload() {
             </Alert>
           ) : null}
         </CardContent>
-        <CardFooter>
-          <Button type="submit" disabled={state.status === "uploading"}>
+        {/* CardFooter ships no vertical padding, and the button translates 0.25rem
+            down on hover. The 1rem gap keeps them from reading as one block. */}
+        <CardFooter className="pt-4">
+          <Button type="submit" className="w-full sm:w-auto" disabled={state.status === "uploading"}>
             {state.status === "uploading" ? "Reading resume…" : "Analyse resume"}
           </Button>
         </CardFooter>
