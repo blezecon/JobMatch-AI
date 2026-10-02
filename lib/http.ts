@@ -54,9 +54,17 @@ export async function fetchJson<T = unknown>(
   if (!response.ok) {
     throw new ApiError(`The job service responded with an error (${response.status}).`, 502);
   }
+  let payload: unknown;
   try {
-    return (await response.json()) as T;
+    payload = await response.json();
   } catch {
     throw new ApiError("The job service returned a response we could not read.", 502);
   }
+  // Some servers answer 200 with an error envelope instead of a status code.
+  const envelope = payload as { error?: { message?: string } | string } | null;
+  if (envelope && typeof envelope === "object" && envelope.error) {
+    const detail = typeof envelope.error === "string" ? envelope.error : envelope.error.message;
+    throw new ApiError("The service reported an error instead of results.", 502, detail);
+  }
+  return payload as T;
 }

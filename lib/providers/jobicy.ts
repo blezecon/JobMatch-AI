@@ -45,7 +45,7 @@ export const jobicy: JobProvider = {
     const terms = queryTerms(query);
     // Jobicy accepts one free-form tag; use it when the query is a single word.
     const tag = terms.length === 1 && /^[a-z0-9+#.]+$/.test(terms[0]) ? terms[0] : "";
-    const params = new URLSearchParams({ count: "50" });
+    const params = new URLSearchParams({ count: "100" });
     if (tag) params.set("tag", tag);
     const payload = await fetchJson<{ jobs?: JobicyJob[] }>(
       `https://jobicy.com/api/v2/remote-jobs?${params.toString()}`,

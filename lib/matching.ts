@@ -85,7 +85,13 @@ export function isSkillLike(requirement: string): boolean {
   if (NON_SKILLS.has(normalized)) return false;
   // "problem solving", "communication skills": every word is a non-skill noun.
   const words = normalized.split(" ").filter(Boolean);
-  return !words.every((word) => NON_SKILLS.has(word));
+  if (words.length === 0 || words.every((word) => NON_SKILLS.has(word))) return false;
+  // A requirement the model copied as a whole sentence is not a skill, however it
+  // is spelled, so this also catches non-English listings. Counted on the raw
+  // string too, since normalisation drops words it cannot read. Punctuation only
+  // counts as a sentence break, never the dot inside "Node.js".
+  const rawWords = requirement.trim().split(/\s+/).filter(Boolean);
+  return rawWords.length <= 4 && words.length <= 4 && !/[.,;:](\s|$)/.test(requirement.trim());
 }
 
 export type MatchLevel = "match" | "partial" | "none";

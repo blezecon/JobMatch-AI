@@ -36,7 +36,7 @@ Every suggestion is grounded in your own resume text, or it is thrown away.
 - PDF resume upload, parsed in memory
 - Structured candidate profile extracted by an open-weight model (name, summary, skills, education,
   experience, projects, certifications)
-- Real job search across four free public APIs at once
+- Real job search across six free public APIs at once
 - Deterministic skill matching with alias normalization
 - Grounded AI explanation: why you match, what is relevant, what to fix
 - Honest missing-requirement reporting, and never an invented qualification
@@ -168,7 +168,7 @@ Requires Node.js 20 or newer.
 
 ## Environment Variables
 
-Job search needs **no configuration at all** — all four sources are free and key-less.
+Job search needs **no configuration at all** — all six sources are free and key-less.
 
 The only thing you must set is an AI backend.
 
@@ -263,13 +263,15 @@ npm run sample:resume   # regenerate scripts/resume.pdf (plain node, no dependen
 
 ## Job API
 
-Four sources, queried in parallel with `Promise.allSettled` and merged into one `Job` shape
+Six sources, queried in parallel with `Promise.allSettled` and merged into one `Job` shape
 (`lib/jobs.ts` defines the interface; each adapter lives in `lib/providers/`):
 
 | Provider | Base URL | Search | Notes |
 | --- | --- | --- | --- |
-| Arbeitnow | `https://www.arbeitnow.com/api/job-board-api` | client-side filter | Europe-leaning; `remote` flag; hybrid in tags |
-| Jobicy | `https://jobicy.com/api/v2/remote-jobs` | `tag` param + filter | remote-first |
+| Arbeitnow | `https://www.arbeitnow.com/api/job-board-api` | client-side filter | Europe-leaning; 2 pages fetched; `remote` flag |
+| Himalayas | `https://himalayas.app/jobs/api` | `query` param | server-side; full descriptions in the list |
+| Jobicy | `https://jobicy.com/api/v2/remote-jobs` | `tag` param + filter | remote-first; 100 per page |
+| Ocean of Jobs | `https://oceanofjobs.com/api/jobs` | `search` + `workplace` params | server-side remote/hybrid/onsite; `include_outdated=1` |
 | RemoteOK | `https://remoteok.com/api` | client-side filter | remote-only, no query parameter |
 | Remotive | `https://remotive.com/api/remote-jobs` | `search` param | remote-first |
 
@@ -278,10 +280,13 @@ Notes worth knowing before you demo:
 - HTML descriptions are stripped to plain text before they reach the model.
 - RemoteOK and Jobicy both require visible attribution: every card shows its source and links to the
   original listing.
-- One provider being down degrades to a warning line, not a blank page. If all four fail you get a
+- One provider being down degrades to a warning line, not a blank page. If all six fail you get a
   clear error — never invented jobs.
-- Filtering is substring/token matching, so results are broad. Location coverage outside Europe is thin
-  on Arbeitnow; the remote-first sources are global but rarely city-specific.
+- Filtering is substring/token matching, so results are broad.
+- **Ocean of Jobs omits descriptions from its list endpoint**, so each returned job costs one extra
+  `/jobs/{id}` call, capped at 12 per search. It has no language facet either, so listings whose title or
+  description is not readable Latin are dropped.
+- Results are capped at 150. There is no pagination or "load more".
 
 ## Project Structure
 
@@ -309,11 +314,12 @@ lib/
 ├── matching.ts                  stage 4: normalize, match, score, shortlist
 ├── jobs.ts                      provider registry + fan-out
 ├── job-utils.ts                 stripHtml, filters, dedupe
-├── providers/                   arbeitnow · jobicy · remoteok · remotive
+├── providers/                   arbeitnow · himalayas · jobicy
+│                               oceanofjobs · remoteok · remotive
 ├── store.ts                     sessionStorage helpers
 └── validation.ts                upload + analyze body guards
 
-test/       matching · jobs · ai · pdf · store · render   (84 tests, no network or model needed)
+test/       matching · jobs · ai · pdf · store · render   (86 tests, no network or model needed)
 types/      all shared types
 scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
 ```
@@ -351,8 +357,8 @@ scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
   the resume and the job listing are truncated to fit `AI_NUM_CTX` (default 16384) and every local call
   asks for a fresh context (`cache_prompt: false`) rather than reusing a stale KV cache. Raise
   `AI_NUM_CTX` if your server was started with more.
-- **Job coverage skews remote and European.** All four sources are free and key-less; none has strong
-  India/Kolkata city-level coverage.
+- **Job coverage skews remote and European.** All six sources are free and key-less; city-level
+  coverage outside Europe is still thin.
 - **Attribution obligations.** RemoteOK and Jobicy require source credit, which the UI provides.
 - **Not an application tool.** It never applies to anything, and never autofills a form.
 

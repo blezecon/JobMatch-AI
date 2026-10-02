@@ -43,13 +43,21 @@ export const arbeitnow: JobProvider = {
   homepage: "https://www.arbeitnow.com",
   requiresAttribution: true,
   async search({ query, location, mode }: JobQuery) {
-    const payload = await fetchJson<{ data?: ArbeitnowJob[] }>(
-      "https://www.arbeitnow.com/api/job-board-api?page=1",
-      {},
-      LIMITS.jobTimeoutMs,
-    );
     const terms = queryTerms(query);
-    return (payload.data ?? [])
+    // No search parameter, so filtering is client-side — which means the newest
+    // page alone hides almost everything. Two pages is the ceiling before this
+    // starts abusing a free API; their terms ask for a link back, which we give.
+    const pages = await Promise.all(
+      [1, 2].map((page) =>
+        fetchJson<{ data?: ArbeitnowJob[] }>(
+          `https://www.arbeitnow.com/api/job-board-api?page=${page}`,
+          {},
+          LIMITS.jobTimeoutMs,
+        ).catch(() => ({ data: [] })),
+      ),
+    );
+    return pages
+      .flatMap((payload) => payload.data ?? [])
       .map(toJob)
       .filter((job) => job.id && job.title)
       .filter((job) => matchesTerms(job, terms))

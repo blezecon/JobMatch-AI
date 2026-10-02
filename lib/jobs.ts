@@ -2,7 +2,9 @@ import type { Job } from "@/types";
 import { ApiError } from "./http";
 import { dedupeKey, type JobProvider, type JobQuery } from "./job-utils";
 import { arbeitnow } from "./providers/arbeitnow";
+import { himalayas } from "./providers/himalayas";
 import { jobicy } from "./providers/jobicy";
+import { oceanofjobs } from "./providers/oceanofjobs";
 import { remoteok } from "./providers/remoteok";
 import { remotive } from "./providers/remotive";
 
@@ -13,7 +15,22 @@ export type { JobProvider, JobQuery, WorkModeFilter } from "./job-utils";
  * jobs. One provider being down must not blank the page: results are merged and
  * the failure is reported as a warning.
  */
-export const PROVIDERS: JobProvider[] = [arbeitnow, jobicy, remoteok, remotive];
+export const PROVIDERS: JobProvider[] = [
+  arbeitnow,
+  himalayas,
+  jobicy,
+  oceanofjobs,
+  remoteok,
+  remotive,
+];
+
+/**
+ * ponytail: flat 150-result ceiling, no pagination, no "load more". Six feeds
+ * already return hundreds of openings per query and the browser re-renders them
+ * all. Upgrade path is a cursor per provider plus an offset in the search API,
+ * which only earns its keep once someone actually scrolls past 150.
+ */
+const MAX_RESULTS = 150;
 
 export type JobSearchResult = {
   jobs: Job[];
@@ -44,7 +61,7 @@ export async function searchJobs(query: JobQuery): Promise<JobSearchResult> {
       seen.add(key);
       // Namespace the id by source: feeds number their jobs independently.
       jobs.push({ ...job, id: `${result.value.provider.id}-${job.id}` });
-      if (jobs.length >= 60) break;
+      if (jobs.length >= MAX_RESULTS) break;
     }
   }
 

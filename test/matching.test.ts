@@ -248,6 +248,18 @@ describe("isSkillLike", () => {
     expect(isSkillLike("C++")).toBe(true);
   });
 
+  it("rejects a whole sentence copied out of a listing", () => {
+    // Seen on a Ukrainian listing: the model returned the entire bullet as a
+    // "required skill", which then surfaced as a partial match.
+    expect(
+      isSkillLike(
+        "Практичний досвід розробки веб-додатків з використанням фреймворків React та Vue.js",
+      ),
+    ).toBe(false);
+    expect(isSkillLike("Strong communication and teamwork skills required.")).toBe(false);
+    expect(isSkillLike("Experience with Kubernetes and Docker")).toBe(false);
+  });
+
   it("rejects the nouns a model mistakes for skills", () => {
     // These appear in postings but are not technologies, so scoring against them
     // would report 0% for a candidate who plainly matches the stack.
@@ -255,6 +267,11 @@ describe("isSkillLike", () => {
     expect(isSkillLike("performance")).toBe(false);
     expect(isSkillLike("communication")).toBe(false);
     expect(isSkillLike("problem solving")).toBe(false);
+  });
+
+  it("still accepts a real multi-word skill", () => {
+    expect(isSkillLike("Tailwind CSS")).toBe(true);
+    expect(isSkillLike("Node.js")).toBe(true);
   });
 });
 
