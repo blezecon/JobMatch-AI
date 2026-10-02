@@ -3,7 +3,9 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { AiStatusBadge } from "@/components/Badges";
-import { PrimaryButton } from "@/components/Feedback";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
+import { Heading } from "@/components/Feedback";
 import type { AiStatus } from "@/types";
 
 const STEPS = [
@@ -17,7 +19,7 @@ const STEPS = [
   },
   {
     title: "Search real job listings",
-    body: "Four free, key-less public job APIs are queried in parallel and merged into one list.",
+    body: "Six free, key-less public job APIs are queried in parallel and merged into one list.",
   },
   {
     title: "Compare and get it straight",
@@ -36,26 +38,23 @@ export default function LandingPage() {
   }, []);
 
   return (
-    <div className="space-y-16">
-      <section className="pt-8 text-center">
-        <p className="mb-3 inline-flex items-center gap-2 rounded-full border border-slate-300 px-3 py-1 text-xs dark:border-slate-700">
-          <span aria-hidden>◆</span> Hacktoberfest 2026 · Build for a Friend
+    <div className="space-y-12">
+      <section className="pt-6 text-center">
+        <p className="mb-4 text-sm font-bold uppercase tracking-wide">
+          Hacktoberfest 2026 · Build for a Friend
         </p>
-        <h1 className="mx-auto max-w-2xl text-4xl font-semibold tracking-tight sm:text-5xl">
+        <h1 className="mx-auto max-w-3xl font-heading text-4xl font-bold sm:text-6xl">
           Understand which jobs actually fit your resume.
         </h1>
-        <p className="mx-auto mt-4 max-w-xl text-slate-600 dark:text-slate-300">
+        <p className="mx-auto mt-6 max-w-2xl text-lg">
           JobMatch AI reads your resume, searches real listings, and tells you plainly what you match,
           what you only half-match, and what is missing. No black-box score, no invented experience.
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
-          <Link href="/resume">
-            <PrimaryButton type="button">Upload resume</PrimaryButton>
+          <Link href="/resume" className={buttonVariants({ size: "lg" })}>
+            Upload resume
           </Link>
-          <Link
-            href="/jobs"
-            className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-100 dark:border-slate-700 dark:hover:bg-slate-800"
-          >
+          <Link href="/jobs" className={buttonVariants({ size: "lg", variant: "neutral" })}>
             Browse jobs first
           </Link>
         </div>
@@ -64,39 +63,40 @@ export default function LandingPage() {
         </p>
       </section>
 
-      <section aria-labelledby="how-heading">
-        <h2 id="how-heading" className="text-2xl font-semibold tracking-tight">
+      <section aria-labelledby="how-heading" className="space-y-4">
+        <h2 id="how-heading" className="font-heading text-3xl font-bold">
           How it works
         </h2>
-        <ol className="mt-6 grid gap-4 sm:grid-cols-2">
+        <ol className="grid gap-4 sm:grid-cols-2">
           {STEPS.map((step, index) => (
-            <li
-              key={step.title}
-              className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900"
-            >
-              <span className="grid size-7 place-items-center rounded-full bg-slate-900 text-sm font-semibold text-white dark:bg-white dark:text-slate-900">
-                {index + 1}
-              </span>
-              <h3 className="mt-3 font-medium">{step.title}</h3>
-              <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{step.body}</p>
+            <li key={step.title}>
+              <Card className="h-full">
+                <CardHeader>
+                  <Heading className="flex items-center gap-2 text-lg">
+                    <span className="inline-grid size-7 place-items-center rounded-base border-2 border-border bg-main">
+                      {index + 1}
+                    </span>
+                    {step.title}
+                  </Heading>
+                </CardHeader>
+                <CardContent>
+                  <p className="text-sm">{step.body}</p>
+                </CardContent>
+              </Card>
             </li>
           ))}
         </ol>
       </section>
 
-      <section
-        aria-labelledby="ai-heading"
-        className="rounded-xl border border-slate-200 bg-white p-6 dark:border-slate-800 dark:bg-slate-900"
-      >
-        <h2 id="ai-heading" className="text-2xl font-semibold tracking-tight">
-          Open-source AI is the engine here
-        </h2>
-        <div className="mt-4 space-y-4 text-slate-600 dark:text-slate-300">
-          <p>
+      <Card className="border-4">
+        <CardHeader>
+          <Heading>Open-source AI is the engine here</Heading>
+          <CardDescription>
             The interesting part of this problem is turning messy resume text and messy job descriptions
-            into the same structured vocabulary. That is what the open-weight model does: it extracts a
-            candidate profile and a requirements list as validated JSON.
-          </p>
+            into the same structured vocabulary. That is what the open-weight model does.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
           <p>
             It runs on <strong>Gemma</strong>, an open-weight model. Point the app at Ollama or a
             llama.cpp server and inference happens on your own machine, so the resume never leaves it.
@@ -107,8 +107,8 @@ export default function LandingPage() {
             and the same job always produce the same report. The model explains the result and is
             required to cite the resume text it used — anything it cannot ground is discarded.
           </p>
-        </div>
-      </section>
+        </CardContent>
+      </Card>
     </div>
   );
 }

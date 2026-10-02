@@ -1,32 +1,25 @@
+import { Badge } from "@/components/ui/badge";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import type { Candidate } from "@/types";
-
-function Item({ label, value }: { label: string; value: string }) {
-  if (!value) return null;
-  return (
-    <div>
-      <dt className="text-xs uppercase tracking-wide text-slate-500 dark:text-slate-400">{label}</dt>
-      <dd className="text-sm">{value}</dd>
-    </div>
-  );
-}
 
 function Chips({ items }: { items: string[] }) {
   // A model can list the same skill twice ("Python", "python"); duplicate React
   // keys are a real error, and a repeated chip tells the user nothing anyway.
-  const unique = [...new Map(items.map((item) => [item.trim().toLowerCase(), item.trim()])).values()].filter(
-    Boolean,
-  );
-  if (unique.length === 0) {
-    return <p className="text-sm text-slate-500">None found.</p>;
-  }
+  const unique = [...new Set(items.map((item) => item.trim()).filter(Boolean))];
+  if (unique.length === 0) return <p className="text-sm">None found.</p>;
   return (
-    <ul className="flex flex-wrap gap-1.5">
-      {unique.map((item, index) => (
-        <li
-          key={`${item}-${index}`}
-          className="rounded-full border border-slate-300 px-2.5 py-1 text-xs dark:border-slate-700"
-        >
-          {item}
+    <ul className="flex flex-wrap gap-2">
+      {unique.map((item) => (
+        <li key={item}>
+          <Badge variant="neutral" className="border-2 border-border shadow-shadow">
+            {item}
+          </Badge>
         </li>
       ))}
     </ul>
@@ -39,48 +32,48 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
   const experience = candidate.experience.filter((item) => hasText([item.title, item.company]));
   const projects = candidate.projects.filter((item) => hasText([item.name, item.description]));
   const education = candidate.education.filter((item) => hasText([item.institution, item.degree]));
+  const certifications = candidate.certifications.filter((item) => hasText([item.name]));
 
   return (
     <div className="space-y-6">
       <div>
-        <h2 className="text-xl font-semibold tracking-tight">{candidate.name}</h2>
-        {candidate.summary ? (
-          <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">{candidate.summary}</p>
-        ) : null}
+        <h2 className="font-heading text-2xl font-bold">{candidate.name}</h2>
+        {candidate.summary ? <p className="mt-1 text-sm">{candidate.summary}</p> : null}
       </div>
 
       <section aria-labelledby="skills-heading">
-        <h3 id="skills-heading" className="mb-2 font-medium">
+        <h3 id="skills-heading" className="mb-2 font-heading font-bold">
           Skills
         </h3>
         <Chips items={candidate.skills} />
       </section>
 
       {experience.length > 0 ? (
-        <section aria-labelledby="experience-heading">
-          <h3 id="experience-heading" className="mb-2 font-medium">
+        <section aria-labelledby="experience-heading" className="space-y-3">
+          <h3 id="experience-heading" className="font-heading font-bold">
             Experience
           </h3>
           <ul className="space-y-3">
             {experience.map((item, index) => (
-              <li
-                key={`${item.company}-${index}`}
-                className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
-              >
-                <p className="text-sm font-medium">
-                  {item.title}
-                  {item.company ? ` · ${item.company}` : ""}
-                </p>
-                {item.period ? (
-                  <p className="text-xs text-slate-500 dark:text-slate-400">{item.period}</p>
-                ) : null}
-                {item.highlights.length > 0 ? (
-                  <ul className="mt-1.5 list-inside list-disc space-y-0.5 text-sm text-slate-600 dark:text-slate-300">
-                    {item.highlights.map((highlight, hIndex) => (
-                      <li key={hIndex}>{highlight}</li>
-                    ))}
-                  </ul>
-                ) : null}
+              <li key={`${item.company}-${index}`}>
+                <Card className="shadow-none">
+                  <CardHeader>
+                    <CardTitle className="text-base">
+                      {item.title}
+                      {item.company ? ` · ${item.company}` : ""}
+                    </CardTitle>
+                    {item.period ? <CardDescription>{item.period}</CardDescription> : null}
+                  </CardHeader>
+                  {item.highlights.length > 0 ? (
+                    <CardContent>
+                      <ul className="list-inside list-disc space-y-0.5 text-sm">
+                        {item.highlights.map((highlight, hIndex) => (
+                          <li key={hIndex}>{highlight}</li>
+                        ))}
+                      </ul>
+                    </CardContent>
+                  ) : null}
+                </Card>
               </li>
             ))}
           </ul>
@@ -88,37 +81,44 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
       ) : null}
 
       {projects.length > 0 ? (
-        <section aria-labelledby="projects-heading">
-          <h3 id="projects-heading" className="mb-2 font-medium">
+        <section aria-labelledby="projects-heading" className="space-y-3">
+          <h3 id="projects-heading" className="font-heading font-bold">
             Projects
           </h3>
           <ul className="space-y-3">
             {projects.map((project, index) => (
-              <li
-                key={`${project.name}-${index}`}
-                className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
-              >
-                <p className="text-sm font-medium">{project.name}</p>
-                {project.description ? (
-                  <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">
-                    {project.description}
-                  </p>
-                ) : null}
-                {project.technologies.length > 0 ? (
-                  <p className="mt-1.5 text-xs text-slate-500 dark:text-slate-400">
-                    {project.technologies.join(" · ")}
-                  </p>
-                ) : null}
-                {project.url ? (
-                  <a
-                    href={project.url}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="mt-1 inline-block text-xs underline underline-offset-2"
-                  >
-                    Project link
-                  </a>
-                ) : null}
+              <li key={`${project.name}-${index}`}>
+                <Card className="shadow-none">
+                  <CardHeader>
+                    <CardTitle className="text-base">{project.name}</CardTitle>
+                    {project.description ? (
+                      <CardDescription>{project.description}</CardDescription>
+                    ) : null}
+                  </CardHeader>
+                  {project.technologies.length > 0 || project.url ? (
+                    <CardContent className="space-y-1 text-sm">
+                      {project.technologies.length > 0 ? (
+                        <p className="flex flex-wrap gap-1.5">
+                          {project.technologies.map((tech) => (
+                            <Badge key={tech} variant="neutral">
+                              {tech}
+                            </Badge>
+                          ))}
+                        </p>
+                      ) : null}
+                      {project.url ? (
+                        <a
+                          href={project.url}
+                          target="_blank"
+                          rel="noreferrer noopener"
+                          className="underline underline-offset-2"
+                        >
+                          Project link
+                        </a>
+                      ) : null}
+                    </CardContent>
+                  ) : null}
+                </Card>
               </li>
             ))}
           </ul>
@@ -126,20 +126,20 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
       ) : null}
 
       {education.length > 0 ? (
-        <section aria-labelledby="education-heading">
-          <h3 id="education-heading" className="mb-2 font-medium">
+        <section aria-labelledby="education-heading" className="space-y-3">
+          <h3 id="education-heading" className="font-heading font-bold">
             Education
           </h3>
           <ul className="space-y-2">
             {education.map((item, index) => (
               <li
                 key={`${item.institution}-${index}`}
-                className="rounded-lg border border-slate-200 p-3 text-sm dark:border-slate-800"
+                className="rounded-base border-2 border-border bg-secondary-background p-3"
               >
-                <p className="font-medium">
+                <p className="font-heading font-bold">
                   {[item.degree, item.field].filter(Boolean).join(" in ") || item.institution}
                 </p>
-                <p className="text-xs text-slate-500 dark:text-slate-400">
+                <p className="text-sm">
                   {[item.institution, item.year].filter(Boolean).join(" · ")}
                 </p>
               </li>
@@ -148,20 +148,22 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
         </section>
       ) : null}
 
-      {candidate.certifications.length > 0 ? (
-        <section aria-labelledby="certs-heading">
-          <h3 id="certs-heading" className="mb-2 font-medium">
+      {certifications.length > 0 ? (
+        <section aria-labelledby="certs-heading" className="space-y-3">
+          <h3 id="certs-heading" className="font-heading font-bold">
             Certifications
           </h3>
-          <dl className="space-y-2">
-            {candidate.certifications.map((item, index) => (
-              <div key={`${item.name}-${index}`} className="text-sm">
-                <Item label="Certification" value={item.name} />
-                <Item label="Issuer" value={item.issuer} />
-                <Item label="Year" value={item.year} />
-              </div>
+          <ul className="space-y-2">
+            {certifications.map((item, index) => (
+              <li
+                key={`${item.name}-${index}`}
+                className="rounded-base border-2 border-border bg-secondary-background p-3 text-sm"
+              >
+                <p className="font-heading font-bold">{item.name}</p>
+                {[item.issuer, item.year].filter(Boolean).join(" · ")}
+              </li>
             ))}
-          </dl>
+          </ul>
         </section>
       ) : null}
     </div>

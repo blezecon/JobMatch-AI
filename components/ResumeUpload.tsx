@@ -1,9 +1,20 @@
 "use client";
 
 import { useRef, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Button } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { Heading } from "@/components/Feedback";
 import { saveCandidate } from "@/lib/store";
 import type { CandidateResponse } from "@/types";
-import { ErrorState, PrimaryButton, SectionCard } from "./Feedback";
 
 type ErrorBody = { error?: string; hint?: string };
 
@@ -54,46 +65,52 @@ export function ResumeUpload() {
   }
 
   return (
-    <SectionCard
-      title="Upload your resume"
-      description="PDF only. Parsed in memory, never written to disk."
-    >
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
-          <label htmlFor="resume-file" className="text-sm font-medium">
-            Resume PDF
-          </label>
-          <input
-            id="resume-file"
-            ref={inputRef}
-            type="file"
-            accept="application/pdf,.pdf"
-            className="text-sm file:mr-3 file:rounded-md file:border-0 file:bg-slate-900 file:px-3 file:py-2 file:text-sm file:font-medium file:text-white hover:file:bg-slate-700 dark:file:bg-white dark:file:text-slate-900 dark:file:hover:bg-slate-200"
-          />
-        </div>
-        <PrimaryButton type="submit" disabled={state.status === "uploading"}>
-          {state.status === "uploading" ? "Reading resume…" : "Analyse resume"}
-        </PrimaryButton>
-        {fileName ? <p className="text-xs text-slate-500">Selected: {fileName}</p> : null}
+    <Card>
+      <CardHeader>
+        <Heading>Upload your resume</Heading>
+        <CardDescription>
+          PDF only. Parsed in memory, never written to disk.
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          <Field>
+            <FieldLabel htmlFor="resume-file">Resume PDF</FieldLabel>
+            <Input id="resume-file" ref={inputRef} type="file" accept="application/pdf,.pdf" />
+          </Field>
+          {fileName ? <p className="text-sm">Selected: {fileName}</p> : null}
+          {state.status === "uploading" ? (
+            <Alert>
+              <AlertTitle>Working on it</AlertTitle>
+              <AlertDescription>
+                Extracting text and running candidate extraction. Local models can take a minute.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {state.status === "done" ? (
+            <Alert>
+              <AlertTitle>Profile extracted</AlertTitle>
+              <AlertDescription>
+                <span aria-hidden>✓</span> Your candidate profile is ready below.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+          {state.status === "error" ? (
+            <Alert variant="destructive" role="alert">
+              <AlertTitle>Resume not processed</AlertTitle>
+              <AlertDescription>
+                <p>{state.message}</p>
+                {state.hint ? <p className="opacity-80">{state.hint}</p> : null}
+              </AlertDescription>
+            </Alert>
+          ) : null}
+        </CardContent>
+        <CardFooter>
+          <Button type="submit" disabled={state.status === "uploading"}>
+            {state.status === "uploading" ? "Reading resume…" : "Analyse resume"}
+          </Button>
+        </CardFooter>
       </form>
-
-      {state.status === "uploading" ? (
-        <p role="status" aria-live="polite" className="mt-4 text-sm text-slate-600 dark:text-slate-300">
-          Extracting text and running candidate extraction. Local models can take a minute.
-        </p>
-      ) : null}
-
-      {state.status === "done" ? (
-        <p role="status" className="mt-4 text-sm text-emerald-700 dark:text-emerald-300">
-          <span aria-hidden>✓</span> Profile extracted.
-        </p>
-      ) : null}
-
-      {state.status === "error" ? (
-        <div className="mt-4">
-          <ErrorState title="Resume not processed" message={state.message} hint={state.hint} />
-        </div>
-      ) : null}
-    </SectionCard>
+    </Card>
   );
 }

@@ -14,12 +14,8 @@ export const metadata: Metadata = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html
-      lang="en"
-      className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
-      suppressHydrationWarning
-    >
-      <body className="flex min-h-full flex-col">
+    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+      <body className="flex min-h-screen flex-col bg-background font-sans text-foreground antialiased">
         <SiteHeader />
         <main className="mx-auto w-full max-w-5xl flex-1 px-4 py-8">{children}</main>
         <SiteFooter />

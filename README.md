@@ -146,7 +146,9 @@ rather than smoothed over.
 
 ## Tech Stack
 
-- **Next.js 16** (App Router, Route Handlers) · **React 19** · **TypeScript** · **Tailwind CSS v4**
+- **Next.js 16** (App Router, Route Handlers)· **React 19** · **TypeScript** · **Tailwind CSS v4**
+- **[neobrutalism components](https://www.neobrutalism.dev)** (shadcn registry on Base UI) — installed
+  with the shadcn CLI, not hand-written
 - **zod** — validates model output, provider payloads and client input
 - **unpdf** — PDF text extraction, no temp files
 - **vitest** — unit tests for the pure functions
@@ -305,6 +307,8 @@ app/
 
 components/    SiteChrome Badges Feedback CandidateProfile ResumeUpload
                JobSearch MatchReport
+components/ui/ registry-installed: button card input label field native-select
+               badge alert empty skeleton
 lib/
 ├── ai.ts                        the only file that knows about models
 ├── schema.ts                    zod schemas for model + client input

@@ -2,10 +2,17 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { buttonVariants } from "@/components/ui/button";
+import {
+  Card, CardContent, CardDescription, CardFooter, CardHeader,
+} from "@/components/ui/card";
+
 import { useCandidate, useJob } from "@/lib/store";
 import type { MatchAnalysis } from "@/types";
 import { LevelBadge } from "./Badges";
-import { EmptyState, ErrorState, LoadingState, PrimaryButton, SectionCard } from "./Feedback";
+import { EmptyState, ErrorState, Heading, LoadingState } from "./Feedback";
 
 type Result = { ok: true; analysis: MatchAnalysis } | { ok: false; message: string; hint?: string };
 
@@ -18,24 +25,20 @@ function RequirementList({
   level: "match" | "partial" | "missing";
   showReason?: boolean;
 }) {
-  if (items.length === 0) {
-    return <p className="text-sm text-slate-500">Nothing in this category.</p>;
-  }
+  if (items.length === 0) return <p className="text-sm">Nothing in this category.</p>;
   return (
     <ul className="space-y-2">
       {items.map((item) => (
         <li
           key={item.requirement}
-          className="flex flex-wrap items-start gap-2 rounded-lg border border-slate-200 p-3 dark:border-slate-800"
+          className="flex flex-wrap items-start gap-3 rounded-base border-2 border-border p-3"
         >
           <LevelBadge level={level} />
           <div className="min-w-0 flex-1">
-            <p className="text-sm font-medium">{item.requirement}</p>
-            {showReason && item.reason ? (
-              <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">{item.reason}</p>
-            ) : null}
+            <p className="font-heading font-bold">{item.requirement}</p>
+            {showReason && item.reason ? <p className="mt-0.5 text-sm">{item.reason}</p> : null}
             {!showReason && item.evidence && item.evidence.length > 0 ? (
-              <ul className="mt-1 space-y-0.5 text-xs text-slate-500 dark:text-slate-400">
+              <ul className="mt-1 space-y-0.5 text-xs opacity-80">
                 {item.evidence.slice(0, 2).map((line, index) => (
                   <li key={index}>{line}</li>
                 ))}
@@ -91,9 +94,7 @@ export function MatchReport({ jobId }: { jobId: string }) {
         title="No resume in this session"
         message="Upload your resume first — the analysis compares it against the listing."
         action={
-          <Link href="/resume">
-            <PrimaryButton type="button">Go to resume</PrimaryButton>
-          </Link>
+          <Link href="/resume" className={buttonVariants()}>Go to resume</Link>
         }
       />
     );
@@ -104,9 +105,7 @@ export function MatchReport({ jobId }: { jobId: string }) {
         title="That job is no longer available in this session"
         message="Job text is kept only in the tab you searched from. Search again to re-analyse it."
         action={
-          <Link href="/jobs">
-            <PrimaryButton type="button">Back to job search</PrimaryButton>
-          </Link>
+          <Link href="/jobs" className={buttonVariants()}>Back to job search</Link>
         }
       />
     );
@@ -124,155 +123,196 @@ export function MatchReport({ jobId }: { jobId: string }) {
   }
 
   const { analysis } = result;
-  const scored = analysis.requirements.requiredSkills.length
-    ? "required skill coverage"
-    : "preferred skill coverage";
   const hasRequirements =
     analysis.requirements.requiredSkills.length > 0 ||
     analysis.requirements.preferredSkills.length > 0 ||
     analysis.requirements.experienceRequirements.length > 0 ||
     analysis.requirements.educationRequirements.length > 0;
+  const scored = analysis.requirements.requiredSkills.length
+    ? "required skill coverage"
+    : "preferred skill coverage";
+
   return (
     <div className="space-y-6">
-      <section className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
-        <div className="flex flex-wrap items-start justify-between gap-3">
-          <div>
-            <h2 className="text-lg font-semibold tracking-tight">{job.title}</h2>
-            <p className="text-sm text-slate-600 dark:text-slate-300">
-              {job.company} · {job.location} · {job.source}
-            </p>
+      <Card className="border-4">
+        <CardHeader>
+          <div className="flex flex-wrap items-start justify-between gap-3">
+            <div className="min-w-0 space-y-1">
+              <Heading className="text-xl">{job.title}</Heading>
+              <CardDescription>
+                {job.company} · {job.location} · {job.source}
+              </CardDescription>
+            </div>
+            <div className="text-right">
+              <p className="font-heading text-4xl font-bold tabular-nums">{analysis.fitScore}%</p>
+              <p className="text-xs opacity-80">{scored}</p>
+            </div>
           </div>
-          <div className="text-right">
-            <p className="text-2xl font-semibold tabular-nums">{analysis.fitScore}%</p>
-            <p className="text-xs text-slate-500">{scored}</p>
-          </div>
-        </div>
-        {analysis.summary ? (
-          <p className="mt-4 text-sm leading-relaxed text-slate-700 dark:text-slate-200">
-            {analysis.summary}
-          </p>
-        ) : null}
-        {!hasRequirements && (
-          <p className="mt-4 text-sm text-amber-800 dark:text-amber-200">
-            <span aria-hidden>⚠</span> The model could not pull any requirements out of this
-            listing, so there is nothing to compare. Try a different job, or a larger model.
-          </p>
-        )}
-        <a
-          href={job.url}
-          target="_blank"
-          rel="noreferrer noopener"
-          className="mt-4 inline-flex items-center rounded-lg bg-slate-900 px-4 py-2.5 text-sm font-medium text-white hover:bg-slate-700 dark:bg-white dark:text-slate-900 dark:hover:bg-slate-200"
-        >
-          Apply on {job.source} ↗
-        </a>
-      </section>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {analysis.summary ? <p className="text-sm leading-relaxed">{analysis.summary}</p> : null}
+          {!hasRequirements && (
+            <Alert>
+              <AlertTitle>Nothing to compare</AlertTitle>
+              <AlertDescription>
+                The model could not pull any requirements out of this listing. Try a different job, or
+                a larger model.
+              </AlertDescription>
+            </Alert>
+          )}
+        </CardContent>
+        <CardFooter>
+          <a
+            href={job.url}
+            target="_blank"
+            rel="noreferrer noopener"
+            className={buttonVariants()}
+          >
+            Apply on {job.source} ↗
+          </a>
+        </CardFooter>
+      </Card>
 
-      <SectionCard title="Matching skills" description="On your resume, and asked for by the job.">
-        <RequirementList items={analysis.matches} level="match" />
-      </SectionCard>
+      <Card>
+        <CardHeader>
+          <Heading>Matching skills</Heading>
+          <CardDescription>On your resume, and asked for by the job.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RequirementList items={analysis.matches} level="match" />
+        </CardContent>
+      </Card>
 
-      <SectionCard
-        title="Partial matches"
-        description="Related to the requirement, but not the same thing."
-      >
-        <RequirementList items={analysis.partialMatches} level="partial" showReason />
-      </SectionCard>
+      <Card>
+        <CardHeader>
+          <Heading>Partial matches</Heading>
+          <CardDescription>Related to the requirement, but not the same thing.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <RequirementList items={analysis.partialMatches} level="partial" showReason />
+        </CardContent>
+      </Card>
 
-      <SectionCard title="Missing requirements" description="Not evidenced anywhere in your resume.">
-        <RequirementList
-          items={analysis.missingRequirements.map((requirement) => ({ requirement }))}
-          level="missing"
-        />
-        {analysis.missingPreferred.length > 0 ? (
-          <div className="mt-5">
-            <h3 className="mb-2 text-sm font-medium">Nice to have, also missing</h3>
-            <ul className="flex flex-wrap gap-1.5">
-              {analysis.missingPreferred.map((item) => (
+      <Card>
+        <CardHeader>
+          <Heading>Missing requirements</Heading>
+          <CardDescription>Not evidenced anywhere in your resume.</CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-5">
+          <RequirementList
+            items={analysis.missingRequirements.map((requirement) => ({ requirement }))}
+            level="missing"
+          />
+          {analysis.missingPreferred.length > 0 ? (
+            <div>
+              <h3 className="mb-2 font-heading font-bold">Nice to have, also missing</h3>
+              <ul className="flex flex-wrap gap-2">
+                {analysis.missingPreferred.map((item) => (
+                  <li key={item}>
+                    <Badge variant="neutral" className="border-2 border-border">
+                      <span aria-hidden className="mr-1">
+                        ○
+                      </span>
+                      {item}
+                    </Badge>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <Heading>Relevant experience</Heading>
+          <CardDescription>Resume items that touch the matched skills.</CardDescription>
+        </CardHeader>
+        <CardContent>
+          {analysis.relevantExperience.length === 0 ? (
+            <p className="text-sm">No experience entries matched the required skills.</p>
+          ) : (
+            <ul className="space-y-2">
+              {analysis.relevantExperience.map((item) => (
                 <li
-                  key={item}
-                  className="rounded-full border border-slate-300 px-2.5 py-1 text-xs dark:border-slate-700"
+                  key={`${item.company}-${item.title}`}
+                  className="rounded-base border-2 border-border p-3"
                 >
-                  <span aria-hidden className="mr-1">
-                    ○
-                  </span>
-                  {item}
+                  <p className="font-heading font-bold">
+                    {item.title} · {item.company}
+                  </p>
+                  <p className="mt-0.5 text-sm">{item.why}</p>
                 </li>
               ))}
             </ul>
-          </div>
-        ) : null}
-      </SectionCard>
+          )}
+        </CardContent>
+      </Card>
 
-      <SectionCard title="Relevant experience" description="Resume items that touch the matched skills.">
-        {analysis.relevantExperience.length === 0 ? (
-          <p className="text-sm text-slate-500">No experience entries matched the required skills.</p>
-        ) : (
-          <ul className="space-y-2">
-            {analysis.relevantExperience.map((item) => (
-              <li
-                key={`${item.company}-${item.title}`}
-                className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
-              >
-                <p className="text-sm font-medium">
-                  {item.title} · {item.company}
-                </p>
-                <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">{item.why}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </SectionCard>
+      <Card>
+        <CardHeader>
+          <Heading>Relevant projects</Heading>
+        </CardHeader>
+        <CardContent>
+          {analysis.relevantProjects.length === 0 ? (
+            <p className="text-sm">No projects matched the required skills.</p>
+          ) : (
+            <ul className="space-y-2">
+              {analysis.relevantProjects.map((item) => (
+                <li key={item.name} className="rounded-base border-2 border-border p-3">
+                  <p className="font-heading font-bold">{item.name}</p>
+                  <p className="mt-0.5 text-sm">{item.why}</p>
+                </li>
+              ))}
+            </ul>
+          )}
+        </CardContent>
+      </Card>
 
-      <SectionCard title="Relevant projects">
-        {analysis.relevantProjects.length === 0 ? (
-          <p className="text-sm text-slate-500">No projects matched the required skills.</p>
-        ) : (
-          <ul className="space-y-2">
-            {analysis.relevantProjects.map((item) => (
-              <li key={item.name} className="rounded-lg border border-slate-200 p-3 dark:border-slate-800">
-                <p className="text-sm font-medium">{item.name}</p>
-                <p className="mt-0.5 text-sm text-slate-600 dark:text-slate-300">{item.why}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </SectionCard>
-
-      <SectionCard
-        title="Resume suggestions"
-        description="Based only on what is already in your resume. Nothing here invents experience."
-      >
-        {analysis.resumeSuggestions.length === 0 ? (
-          <p className="text-sm text-slate-500">No grounded suggestions for this role.</p>
-        ) : (
-          <ul className="space-y-2">
-            {analysis.resumeSuggestions.map((suggestion, index) => (
-              <li
-                key={`${suggestion.kind}-${index}`}
-                className="rounded-lg border border-slate-200 p-3 dark:border-slate-800"
-              >
-                <div className="mb-1 flex items-center gap-2">
-                  <LevelBadge level={suggestion.kind === "missing" ? "missing" : "match"} />
-                  {suggestion.kind === "missing" ? "Gap" : "Reword"}
-                </div>
-                <p className="text-sm">{suggestion.text}</p>
-                {suggestion.kind === "reword" && suggestion.evidenceRef ? (
-                  <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-                    Based on your resume: “{suggestion.evidenceRef}”
-                  </p>
-                ) : null}
-              </li>
-            ))}
-          </ul>
-        )}
-        {analysis.meta.ungroundedSuggestionsDropped > 0 ? (
-          <p className="mt-3 text-xs text-slate-500">
-            {analysis.meta.ungroundedSuggestionsDropped} suggestion(s) were discarded because they
-            were not backed by your resume text.
-          </p>
-        ) : null}
-      </SectionCard>
+      <Card>
+        <CardHeader>
+          <Heading>Resume suggestions</Heading>
+          <CardDescription>
+            Based only on what is already in your resume. Nothing here invents experience.
+          </CardDescription>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {analysis.resumeSuggestions.length === 0 ? (
+            <p className="text-sm">No grounded suggestions for this role.</p>
+          ) : (
+            <ul className="space-y-2">
+              {analysis.resumeSuggestions.map((suggestion, index) => (
+                <li
+                  key={`${suggestion.kind}-${index}`}
+                  className="space-y-1 rounded-base border-2 border-border p-3"
+                >
+                  <div className="flex items-center gap-2">
+                    <LevelBadge level={suggestion.kind === "missing" ? "missing" : "match"} />
+                    <span className="font-heading font-bold">
+                      {suggestion.kind === "missing" ? "Gap" : "Reword"}
+                    </span>
+                  </div>
+                  <p className="text-sm">{suggestion.text}</p>
+                  {suggestion.kind === "reword" && suggestion.evidenceRef ? (
+                    <p className="text-xs opacity-80">
+                      Based on your resume: “{suggestion.evidenceRef}”
+                    </p>
+                  ) : null}
+                </li>
+              ))}
+            </ul>
+          )}
+          {analysis.meta.ungroundedSuggestionsDropped > 0 ? (
+            <Alert>
+              <AlertTitle>Some suggestions were discarded</AlertTitle>
+              <AlertDescription>
+                {analysis.meta.ungroundedSuggestionsDropped} suggestion(s) were dropped because they
+                were not backed by your resume text.
+              </AlertDescription>
+            </Alert>
+          ) : null}
+        </CardContent>
+      </Card>
     </div>
   );
 }

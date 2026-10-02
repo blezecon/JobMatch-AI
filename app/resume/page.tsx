@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { buttonVariants } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { CandidateProfile } from "@/components/CandidateProfile";
-import { EmptyState, PrimaryButton, SectionCard } from "@/components/Feedback";
+import { EmptyState, Heading } from "@/components/Feedback";
 import { ResumeUpload } from "@/components/ResumeUpload";
 import { useCandidate } from "@/lib/store";
 
@@ -12,8 +14,8 @@ export default function ResumePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Your resume</h1>
-        <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
+        <h1 className="font-heading text-3xl font-bold">Your resume</h1>
+        <p className="mt-1">
           The extracted profile stays in this browser tab. Uploading a new PDF replaces it.
         </p>
       </div>
@@ -21,14 +23,18 @@ export default function ResumePage() {
       <ResumeUpload />
 
       {candidate ? (
-        <SectionCard title="Candidate profile" description="Extracted by the open-weight model.">
-          <CandidateProfile candidate={candidate} />
-          <div className="mt-6">
-            <Link href="/jobs">
-              <PrimaryButton type="button">Search jobs for this profile</PrimaryButton>
+        <Card>
+          <CardHeader>
+            <Heading>Candidate profile</Heading>
+            <CardDescription>Extracted by the open-weight model.</CardDescription>
+          </CardHeader>
+          <CardContent className="space-y-6">
+            <CandidateProfile candidate={candidate} />
+            <Link href="/jobs" className={buttonVariants()}>
+              Search jobs for this profile
             </Link>
-          </div>
-        </SectionCard>
+          </CardContent>
+        </Card>
       ) : (
         <EmptyState
           title="No profile yet"

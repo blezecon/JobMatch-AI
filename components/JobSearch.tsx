@@ -2,9 +2,23 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useState } from "react";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Button, buttonVariants } from "@/components/ui/button";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+} from "@/components/ui/card";
+import { Empty, EmptyDescription, EmptyHeader, EmptyTitle } from "@/components/ui/empty";
+import { Field, FieldLabel } from "@/components/ui/field";
+import { Input } from "@/components/ui/input";
+import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
+import { Heading } from "@/components/Feedback";
 import { saveJobs } from "@/lib/store";
 import type { Job, JobsResponse } from "@/types";
-import { EmptyState, ErrorState, LoadingState, PrimaryButton } from "./Feedback";
 
 type SearchState =
   | { status: "idle" }
@@ -67,132 +81,123 @@ export function JobSearch() {
 
   return (
     <div className="space-y-6">
-      <form
-        onSubmit={runSearch}
-        className="grid gap-4 rounded-xl border border-slate-200 bg-white p-5 sm:grid-cols-2 dark:border-slate-800 dark:bg-slate-900"
-      >
-        <div className="sm:col-span-2">
-          <label htmlFor="role" className="mb-1 block text-sm font-medium">
-            Role or keywords
-          </label>
-          <input
-            id="role"
-            value={role}
-            onChange={(event) => setRole(event.target.value)}
-            placeholder="Frontend Developer"
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/20 dark:border-slate-700 dark:bg-slate-950"
-          />
-        </div>
-        <div>
-          <label htmlFor="location" className="mb-1 block text-sm font-medium">
-            Location
-          </label>
-          <input
-            id="location"
-            value={location}
-            onChange={(event) => setLocation(event.target.value)}
-            placeholder="Kolkata, India"
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/20 dark:border-slate-700 dark:bg-slate-950"
-          />
-        </div>
-        <div>
-          <label htmlFor="mode" className="mb-1 block text-sm font-medium">
-            Work mode
-          </label>
-          <select
-            id="mode"
-            value={mode}
-            onChange={(event) => setMode(event.target.value)}
-            className="w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm outline-none focus-visible:border-slate-900 focus-visible:ring-2 focus-visible:ring-slate-900/20 dark:border-slate-700 dark:bg-slate-950"
-          >
-            {MODES.map((option) => (
-              <option key={option.value} value={option.value}>
-                {option.label}
-              </option>
-            ))}
-          </select>
-        </div>
-        <div className="sm:col-span-2">
-          <PrimaryButton type="submit" disabled={state.status === "loading"}>
-            {state.status === "loading" ? "Searching…" : "Search jobs"}
-          </PrimaryButton>
-        </div>
-      </form>
-
-      {state.status === "loading" ? (
-        <LoadingState label="Searching job boards…" detail="Querying free public job APIs." />
-      ) : null}
+      <Card>
+        <form onSubmit={runSearch}>
+          <CardHeader>
+            <Heading>Search openings</Heading>
+            <CardDescription>
+              Six free public job APIs, queried at once. Applying always happens on the original
+              listing.
+            </CardDescription>
+          </CardHeader>
+          <CardContent className="grid gap-4 sm:grid-cols-2">
+            <Field className="sm:col-span-2">
+              <FieldLabel htmlFor="role">Role or keywords</FieldLabel>
+              <Input
+                id="role"
+                value={role}
+                onChange={(event) => setRole(event.target.value)}
+                placeholder="Frontend Developer"
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="location">Location</FieldLabel>
+              <Input
+                id="location"
+                value={location}
+                onChange={(event) => setLocation(event.target.value)}
+                placeholder="Kolkata, India"
+              />
+            </Field>
+            <Field>
+              <FieldLabel htmlFor="mode">Work mode</FieldLabel>
+              <NativeSelect id="mode" value={mode} onChange={(event) => setMode(event.target.value)}>
+                {MODES.map((option) => (
+                  <NativeSelectOption key={option.value} value={option.value}>
+                    {option.label}
+                  </NativeSelectOption>
+                ))}
+              </NativeSelect>
+            </Field>
+          </CardContent>
+          <CardFooter>
+            <Button type="submit" disabled={state.status === "loading"}>
+              {state.status === "loading" ? "Searching…" : "Search jobs"}
+            </Button>
+          </CardFooter>
+        </form>
+      </Card>
 
       {state.status === "error" ? (
-        <ErrorState title="Search failed" message={state.message} hint={state.hint} />
+        <Alert variant="destructive" role="alert">
+          <AlertTitle>Search failed</AlertTitle>
+          <AlertDescription>
+            <p>{state.message}</p>
+            {state.hint ? <p className="opacity-80">{state.hint}</p> : null}
+          </AlertDescription>
+        </Alert>
+      ) : null}
+
+      {state.status === "done" && state.warnings.length > 0 ? (
+        <Alert>
+          <AlertTitle>Some sources were unavailable</AlertTitle>
+          <AlertDescription>{state.warnings.join(" ")}</AlertDescription>
+        </Alert>
       ) : null}
 
       {state.status === "done" && state.jobs.length === 0 ? (
-        <EmptyState
-          title="No jobs found"
-          message="Try a broader role, drop the location filter, or set the work mode to Any."
-          action={
-            <PrimaryButton
-              type="button"
-              onClick={() => {
-                setLocation("");
-                setMode("any");
-              }}
-            >
-              Clear filters
-            </PrimaryButton>
-          }
-        />
+        <Empty>
+          <EmptyHeader>
+            <EmptyTitle>No jobs found</EmptyTitle>
+            <EmptyDescription>
+              Try a broader role, drop the location filter, or set the work mode to Any.
+            </EmptyDescription>
+          </EmptyHeader>
+        </Empty>
       ) : null}
 
       {state.status === "done" && state.jobs.length > 0 ? (
-        <div className="space-y-3">
-          {state.warnings.length > 0 ? (
-            <p role="status" className="text-xs text-amber-700 dark:text-amber-300">
-              Some sources were unavailable: {state.warnings.join(" ")}
-            </p>
-          ) : null}
-          <ul className="space-y-3">
-            {state.jobs.map((job) => (
-              <li key={`${job.source}-${job.id}`}>
-                <article className="rounded-xl border border-slate-200 bg-white p-5 dark:border-slate-800 dark:bg-slate-900">
+        <ul className="space-y-3">
+          {state.jobs.map((job) => (
+            <li key={job.id}>
+              <Card>
+                <CardHeader>
                   <div className="flex flex-wrap items-start justify-between gap-3">
-                    <div className="min-w-0">
-                      <h3 className="font-semibold tracking-tight">{job.title}</h3>
-                      <p className="text-sm text-slate-600 dark:text-slate-300">
+                    <div className="min-w-0 space-y-1">
+                      <Heading>{job.title}</Heading>
+                      <CardDescription>
                         {job.company} · {job.location}
                         {job.employmentType ? ` · ${job.employmentType}` : ""}
-                      </p>
+                      </CardDescription>
                     </div>
-                    <span className="rounded-full border border-slate-300 px-2 py-0.5 text-xs text-slate-600 dark:border-slate-700 dark:text-slate-300">
+                    <Badge variant="neutral" className="border-2 border-border">
                       {job.source}
-                    </span>
+                    </Badge>
                   </div>
-                  <p className="mt-2 line-clamp-3 text-sm text-slate-600 dark:text-slate-300">
+                </CardHeader>
+                <CardContent>
+                  <p className="line-clamp-3 text-sm">
                     {job.description.slice(0, 320)}
                     {job.description.length > 320 ? "…" : ""}
                   </p>
-                  <div className="mt-4 flex flex-wrap gap-2">
-                    <PrimaryButton
-                      type="button"
-                      onClick={() => router.push(`/analyze/${encodeURIComponent(job.id)}`)}
-                    >
-                      Analyze match
-                    </PrimaryButton>
-                    <a
-                      href={job.url}
-                      target="_blank"
-                      rel="noreferrer noopener"
-                      className="inline-flex items-center justify-center rounded-lg border border-slate-300 px-4 py-2.5 text-sm font-medium transition-colors hover:bg-slate-100 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-slate-900 dark:border-slate-700 dark:hover:bg-slate-800"
-                    >
-                      Apply on {job.source} ↗
-                    </a>
-                  </div>
-                </article>
-              </li>
-            ))}
-          </ul>
-        </div>
+                </CardContent>
+                <CardFooter className="flex-wrap gap-2">
+                  <Button onClick={() => router.push(`/analyze/${encodeURIComponent(job.id)}`)}>
+                    Analyze match
+                  </Button>
+                  <a
+                    href={job.url}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className={buttonVariants({ variant: "neutral" })}
+                  >
+                    Apply on {job.source} ↗
+                  </a>
+                </CardFooter>
+              </Card>
+            </li>
+          ))}
+        </ul>
       ) : null}
     </div>
   );
