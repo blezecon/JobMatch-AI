@@ -1,0 +1,56 @@
+%PDF-1.4
+1 0 obj
+<< /Type /Catalog /Pages 2 0 R >>
+endobj
+2 0 obj
+<< /Type /Pages /Kids [3 0 R] /Count 1 >>
+endobj
+3 0 obj
+<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 5 0 R >> >> /Contents 4 0 R >>
+endobj
+4 0 obj
+<< /Length 759 >>
+stream
+BT
+/F1 12 Tf
+14 TL
+50 780 Td
+(Priya Sharma) Tj
+T* (priya.sharma@example.com | Kolkata, India) Tj
+T* () Tj
+T* (SUMMARY) Tj
+T* (Final-year Computer Science student building web applications.) Tj
+T* () Tj
+T* (SKILLS) Tj
+T* (JavaScript, React, Git, HTML, CSS, Node.js, PostgreSQL) Tj
+T* () Tj
+T* (EXPERIENCE) Tj
+T* (Frontend Developer Intern, Acme Software, June 2023 - Nov 2023) Tj
+T* (- Built a Student Feedback System in React used by 500 students) Tj
+T* (- Wrote unit tests for the reporting module) Tj
+T* () Tj
+T* (PROJECTS) Tj
+T* (Student Feedback System - React dashboard for course feedback) Tj
+T* (Weather Now - Node.js and Express API with a static frontend) Tj
+T* () Tj
+T* (EDUCATION) Tj
+T* (B.Tech Computer Science, University of Calcutta, 2024) Tj
+ET
+endstream
+endobj
+5 0 obj
+<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>
+endobj
+xref
+0 6
+0000000000 65535 f 
+0000000009 00000 n 
+0000000058 00000 n 
+0000000115 00000 n 
+0000000241 00000 n 
+0000001051 00000 n 
+trailer
+<< /Size 6 /Root 1 0 R >>
+startxref
+1121
+%%EOF
