@@ -32,7 +32,7 @@ export const PROVIDERS: JobProvider[] = [
  */
 const MAX_RESULTS = 150;
 
-export type JobSearchResult = {
+type JobSearchResult = {
   jobs: Job[];
   warnings: string[];
 };

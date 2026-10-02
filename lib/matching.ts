@@ -59,7 +59,7 @@ export function normalizeSkill(raw: string): string {
   return ALIASES[stripped] ?? ALIASES[stripped.replace(/[./]/g, "")] ?? stripped;
 }
 
-export function skillTokens(value: string): string[] {
+function skillTokens(value: string): string[] {
   return normalizeSkill(value)
     .split(" ")
     .filter((token) => token.length > 1 && !STOPWORDS.has(token));
@@ -126,7 +126,7 @@ export function matchSkill(candidateSkills: string[], requirement: string): Matc
   return "none";
 }
 
-export type DeterministicMatch = {
+type DeterministicMatch = {
   matches: MatchEvidence[];
   partialMatches: PartialMatch[];
   missingRequirements: string[];

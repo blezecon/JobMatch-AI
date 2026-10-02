@@ -137,8 +137,7 @@ An open-weight model is not a checkbox here — it is what makes the product pos
 **Verified end to end** with `gemma3:4b` on Ollama (fully local, ~50 s to extract the profile,
 ~3 min per full analysis on CPU), `google/gemma-3-27b-it` on OpenRouter (~7 s to extract,
 ~12–40 s per analysis), and `phi4.gguf` on llama.cpp over the LAN (~4 s to extract,
-~16 s per analysis). Gemma is the default everywhere it is available; on a Groq account
-that does not host Gemma, the default falls back to `openai/gpt-oss-20b`.
+~16 s per analysis). Gemma is the default on every backend.
 
 No claim of "100% accuracy" is made here. Small models misread resumes and mis-extract requirements.
 That is why stage 4 is code, why every output is validated, and why missing skills are stated plainly
@@ -149,10 +148,11 @@ rather than smoothed over.
 - **Next.js 16** (App Router, Route Handlers)· **React 19** · **TypeScript** · **Tailwind CSS v4**
 - **[neobrutalism components](https://www.neobrutalism.dev)** (shadcn registry on Base UI) — installed
   with the shadcn CLI, not hand-written
+- **[lucide-react](https://lucide.dev)** — the only icon library
 - **zod** — validates model output, provider payloads and client input
 - **unpdf** — PDF text extraction, no temp files
 - **vitest** — unit tests for the pure functions
-- **Open-weight LLM** via any OpenAI-compatible `/chat/completions` endpoint: Ollama, llama.cpp, Groq, OpenRouter
+- **Open-weight LLM** via any OpenAI-compatible `/chat/completions` endpoint: Ollama, llama.cpp, OpenRouter
 
 No authentication, no database, no Redis, no queue, no vector store, no RAG, no agent framework, no
 state-management library.
@@ -176,8 +176,7 @@ The only thing you must set is an AI backend.
 
 | Variable | Required | Purpose |
 | --- | --- | --- |
-| `AI_PROVIDER` | yes | `ollama`, `llamacpp`, `groq` or `openrouter` |
-| `GROQ_API_KEY` | for `groq` | API key, stays server-side |
+| `AI_PROVIDER` | yes | `ollama`, `llamacpp` or `openrouter` |
 | `OPENROUTER_API_KEY` | for `openrouter` | API key, stays server-side |
 | `AI_BASE_URL` | no | Override the provider URL (any OpenAI-compatible server) |
 | `AI_MODEL` | no | Override the default model |
@@ -185,7 +184,7 @@ The only thing you must set is an AI backend.
 | `OLLAMA_MODEL` | no | Default `gemma3:4b` |
 | `LLAMACPP_BASE_URL` | no | Default `http://localhost:8080/v1` |
 | `LLAMACPP_MODEL` | no | Ignored by `llama-server`; set it anyway for other servers |
-| `GROQ_BASE_URL`, `OPENROUTER_BASE_URL` | no | Same override for the hosted providers |
+| `OPENROUTER_BASE_URL` | no | Override the OpenRouter URL |
 | `AI_TIMEOUT_MS` | no | Default `180000`; local CPU inference is slow |
 | `AI_NUM_CTX` | no | Default `16384`; context window requested from local servers |
 | `MAX_RESUME_BYTES` | no | Default 5 MB |
@@ -217,19 +216,7 @@ echo "OPENROUTER_API_KEY=sk-or-..." >> .env.local
 
 Default model: `google/gemma-3-27b-it`. Free tier works. A full analysis takes ~15–40 s.
 
-### Option C — Groq
-
-```bash
-echo "AI_PROVIDER=groq" >> .env.local
-echo "GROQ_API_KEY=gsk_..." >> .env.local
-```
-
-Default model: `openai/gpt-oss-20b`. Groq gates models per organization: if your key returns
-`403 ... blocked at the organization level`, an admin must enable the model at
-https://console.groq.com/settings/limits. The app reports this as
-"The model … is not enabled for this groq account" rather than blaming your key.
-
-### Option D — llama.cpp
+### Option C — llama.cpp (tested)
 
 ```bash
 llama-server -m phi4.gguf --host 0.0.0.0 --port 8080
@@ -337,7 +324,7 @@ scripts/    make-sample-resume.mjs (sample resume.pdf), verify-analyze-page.mjs 
 - **Local by choice.** On Ollama or llama.cpp the resume never leaves your machine.
 - **Client-side session only.** The candidate profile and the job list live in `sessionStorage` and
   disappear when the tab closes.
-- **Cloud caveat.** On Groq or OpenRouter, resume text is sent to that provider's API for inference.
+- **Cloud caveat.** On OpenRouter, resume text is sent to that provider's API for inference.
   Use the local backends if that matters.
 - Model replies can echo resume content, so a malformed-output error is never surfaced verbatim to the
   browser.

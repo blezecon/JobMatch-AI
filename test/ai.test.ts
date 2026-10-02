@@ -68,8 +68,8 @@ function fakeBackend(
   const originalFetch = globalThis.fetch;
   const originalEnv = { ...process.env };
 
-  process.env.AI_PROVIDER = "groq";
-  process.env.GROQ_API_KEY = "test-key";
+  process.env.AI_PROVIDER = "openrouter";
+  process.env.OPENROUTER_API_KEY = "test-key";
   delete process.env.AI_BASE_URL;
   delete process.env.AI_MODEL;
 
@@ -131,7 +131,7 @@ it("sends an authenticated request to the configured OpenAI-compatible endpoint"
   try {
     await import("@/lib/ai").then((m) => m.extractCandidate("resume text"));
     expect(backend.captured).toHaveLength(1);
-    expect(backend.captured[0].url).toBe("https://api.groq.com/openai/v1/chat/completions");
+    expect(backend.captured[0].url).toBe("https://openrouter.ai/api/v1/chat/completions");
     expect(backend.captured[0].auth).toBe("Bearer test-key");
     expect(backend.captured[0].body.response_format).toEqual({ type: "json_object" });
     expect(backend.captured[0].body.model).toBeTruthy();
@@ -190,17 +190,17 @@ it("maps a rejected key to a readable error", async () => {
 });
 
 it("distinguishes a disabled model from a bad key", async () => {
-  // Groq answers 403 both for "org has not enabled this model" and for refused
-  // credentials; only the first is fixable by changing AI_MODEL.
+  // Some providers answer 403 both for "model not enabled for this account" and
+  // for refused credentials; only the first is fixable by changing AI_MODEL.
   const blocked = fakeBackend(() => ({
     status: 403,
-    body: "The model `openai/gpt-oss-20b` is blocked at the organization level.",
+    body: "The model `google/gemma-3-27b-it` is blocked at the organization level.",
   }));
   try {
     const { extractCandidate } = await import("@/lib/ai");
     const error = await extractCandidate("resume").catch((e: unknown) => e);
     expect(error).toBeInstanceOf(Error);
-    expect((error as Error).message).toMatch(/not enabled for this groq account/i);
+    expect((error as Error).message).toMatch(/not enabled for this openrouter account/i);
     expect((error as Error).message).not.toMatch(/credentials/i);
   } finally {
     blocked.restore();
@@ -242,7 +242,7 @@ it("names the model when the backend does not serve it", async () => {
   const backend = fakeBackend(() => ({ status: 404, body: "model not found" }));
   try {
     const { extractCandidate } = await import("@/lib/ai");
-    await expect(extractCandidate("resume")).rejects.toThrow(/is not available on groq/i);
+    await expect(extractCandidate("resume")).rejects.toThrow(/is not available on openrouter/i);
   } finally {
     backend.restore();
   }
@@ -336,8 +336,8 @@ it("records the prompt version", () => {
 
 it("fails with a hint when no API key is configured", () => {
   const original = { ...process.env };
-  process.env.AI_PROVIDER = "groq";
-  delete process.env.GROQ_API_KEY;
+  process.env.AI_PROVIDER = "openrouter";
+  delete process.env.OPENROUTER_API_KEY;
   try {
     expect(() => requireAiConfig()).toThrow(/No API key/i);
     expect(describeAi().configured).toBe(false);

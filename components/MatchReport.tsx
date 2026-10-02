@@ -10,6 +10,17 @@ import {
 } from "@/components/ui/card";
 
 import { useCandidate, useJob } from "@/lib/store";
+import {
+  CircleCheck,
+  CircleDashed,
+  CircleSlash,
+  ExternalLink,
+  FolderGit2,
+  Lightbulb,
+  ScanSearch,
+  Target,
+  TriangleAlert,
+} from "lucide-react";
 import type { MatchAnalysis } from "@/types";
 import { LevelBadge } from "./Badges";
 import { EmptyState, ErrorState, Heading, LoadingState } from "./Feedback";
@@ -113,6 +124,7 @@ export function MatchReport({ jobId }: { jobId: string }) {
   if (!result) {
     return (
       <LoadingState
+        icon={ScanSearch}
         label="Comparing your resume to this job…"
         detail="Requirement extraction, deterministic matching, then a grounded explanation."
       />
@@ -153,7 +165,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
           {analysis.summary ? <p className="text-sm leading-relaxed">{analysis.summary}</p> : null}
           {!hasRequirements && (
             <Alert>
-              <AlertTitle>Nothing to compare</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                <TriangleAlert aria-hidden className="size-4" />
+                Nothing to compare
+              </AlertTitle>
               <AlertDescription>
                 The model could not pull any requirements out of this listing. Try a different job, or
                 a larger model.
@@ -168,14 +183,18 @@ export function MatchReport({ jobId }: { jobId: string }) {
             rel="noreferrer noopener"
             className={buttonVariants()}
           >
-            Apply on {job.source} ↗
+            <ExternalLink aria-hidden />
+            Apply on {job.source}
           </a>
         </CardFooter>
       </Card>
 
       <Card>
         <CardHeader>
-          <Heading>Matching skills</Heading>
+          <Heading className="flex items-center gap-2">
+            <CircleCheck aria-hidden className="size-5" />
+            Matching skills
+          </Heading>
           <CardDescription>On your resume, and asked for by the job.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -185,7 +204,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
 
       <Card>
         <CardHeader>
-          <Heading>Partial matches</Heading>
+          <Heading className="flex items-center gap-2">
+            <CircleDashed aria-hidden className="size-5" />
+            Partial matches
+          </Heading>
           <CardDescription>Related to the requirement, but not the same thing.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -195,7 +217,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
 
       <Card>
         <CardHeader>
-          <Heading>Missing requirements</Heading>
+          <Heading className="flex items-center gap-2">
+            <CircleSlash aria-hidden className="size-5" />
+            Missing requirements
+          </Heading>
           <CardDescription>Not evidenced anywhere in your resume.</CardDescription>
         </CardHeader>
         <CardContent className="space-y-5">
@@ -225,7 +250,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
 
       <Card>
         <CardHeader>
-          <Heading>Relevant experience</Heading>
+          <Heading className="flex items-center gap-2">
+            <Target aria-hidden className="size-5" />
+            Relevant experience
+          </Heading>
           <CardDescription>Resume items that touch the matched skills.</CardDescription>
         </CardHeader>
         <CardContent>
@@ -251,7 +279,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
 
       <Card>
         <CardHeader>
-          <Heading>Relevant projects</Heading>
+          <Heading className="flex items-center gap-2">
+            <FolderGit2 aria-hidden className="size-5" />
+            Relevant projects
+          </Heading>
         </CardHeader>
         <CardContent>
           {analysis.relevantProjects.length === 0 ? (
@@ -271,7 +302,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
 
       <Card>
         <CardHeader>
-          <Heading>Resume suggestions</Heading>
+          <Heading className="flex items-center gap-2">
+            <Lightbulb aria-hidden className="size-5" />
+            Resume suggestions
+          </Heading>
           <CardDescription>
             Based only on what is already in your resume. Nothing here invents experience.
           </CardDescription>
@@ -304,7 +338,10 @@ export function MatchReport({ jobId }: { jobId: string }) {
           )}
           {analysis.meta.ungroundedSuggestionsDropped > 0 ? (
             <Alert>
-              <AlertTitle>Some suggestions were discarded</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                <TriangleAlert aria-hidden className="size-4" />
+                Some suggestions were discarded
+              </AlertTitle>
               <AlertDescription>
                 {analysis.meta.ungroundedSuggestionsDropped} suggestion(s) were dropped because they
                 were not backed by your resume text.

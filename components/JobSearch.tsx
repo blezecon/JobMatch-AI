@@ -18,6 +18,7 @@ import { Input } from "@/components/ui/input";
 import { NativeSelect, NativeSelectOption } from "@/components/ui/native-select";
 import { Heading } from "@/components/Feedback";
 import { saveJobs } from "@/lib/store";
+import { Search, Loader2, TriangleAlert, Sparkles, ExternalLink, ScanSearch } from "lucide-react";
 import { cn } from "@/lib/utils";
 import type { Job, JobsResponse } from "@/types";
 
@@ -85,7 +86,10 @@ export function JobSearch() {
       <Card>
         <form onSubmit={runSearch}>
           <CardHeader>
-            <Heading>Search openings</Heading>
+            <Heading className="flex items-center gap-2">
+              <Search aria-hidden className="size-5" />
+              Search openings
+            </Heading>
             <CardDescription>
               Six free public job APIs, queried at once. Applying always happens on the original
               listing.
@@ -124,7 +128,17 @@ export function JobSearch() {
           {/* Breathing room so the hover translate does not touch the location field. */}
           <CardFooter className="pt-4">
             <Button type="submit" className="w-full sm:w-auto" disabled={state.status === "loading"}>
-              {state.status === "loading" ? "Searching…" : "Search jobs"}
+              {state.status === "loading" ? (
+                <>
+                  <Loader2 aria-hidden className="animate-spin" />
+                  Searching…
+                </>
+              ) : (
+                <>
+                  <Search aria-hidden />
+                  Search jobs
+                </>
+              )}
             </Button>
           </CardFooter>
         </form>
@@ -132,7 +146,10 @@ export function JobSearch() {
 
       {state.status === "error" ? (
         <Alert variant="destructive" role="alert">
-          <AlertTitle>Search failed</AlertTitle>
+          <AlertTitle className="flex items-center gap-2">
+            <TriangleAlert aria-hidden className="size-4" />
+            Search failed
+          </AlertTitle>
           <AlertDescription>
             <p>{state.message}</p>
             {state.hint ? <p className="opacity-80">{state.hint}</p> : null}
@@ -142,7 +159,10 @@ export function JobSearch() {
 
       {state.status === "done" && state.warnings.length > 0 ? (
         <Alert>
-          <AlertTitle>Some sources were unavailable</AlertTitle>
+          <AlertTitle className="flex items-center gap-2">
+            <TriangleAlert aria-hidden className="size-4" />
+            Some sources were unavailable
+          </AlertTitle>
           <AlertDescription>{state.warnings.join(" ")}</AlertDescription>
         </Alert>
       ) : null}
@@ -150,7 +170,10 @@ export function JobSearch() {
       {state.status === "done" && state.jobs.length === 0 ? (
         <Empty>
           <EmptyHeader>
-            <EmptyTitle>No jobs found</EmptyTitle>
+            <EmptyTitle className="flex items-center gap-2">
+              <Sparkles aria-hidden className="size-4" />
+              No jobs found
+            </EmptyTitle>
             <EmptyDescription>
               Try a broader role, drop the location filter, or set the work mode to Any.
             </EmptyDescription>
@@ -188,6 +211,7 @@ export function JobSearch() {
                     className="w-full sm:w-auto"
                     onClick={() => router.push(`/analyze/${encodeURIComponent(job.id)}`)}
                   >
+                    <ScanSearch aria-hidden />
                     Analyze match
                   </Button>
                   <a
@@ -196,7 +220,8 @@ export function JobSearch() {
                     rel="noreferrer noopener"
                     className={cn(buttonVariants({ variant: "neutral" }), "w-full sm:w-auto")}
                   >
-                    Apply on {job.source} ↗
+                    <ExternalLink aria-hidden />
+                    Apply on {job.source}
                   </a>
                 </CardFooter>
               </Card>

@@ -112,8 +112,8 @@ function upstreamError(status: number, cfg: AiConfig, body: string): ApiError {
     return new ApiError(`The AI backend rejected our credentials (${cfg.provider}).`, 502);
   }
   if (status === 403) {
-    // Groq returns 403 when the key is valid but the model is not enabled for
-    // the organization, which is not a credentials problem.
+    // Some providers return 403 when the key is valid but the model is not
+    // enabled for the account, which is not a credentials problem.
     const blocked = /blocked|terms acceptance|not enabled/i.test(body);
     return new ApiError(
       blocked
@@ -331,7 +331,7 @@ export async function extractJobRequirements(job: Job): Promise<JobRequirements>
   };
 }
 
-export type ExplainedMatch = {
+type ExplainedMatch = {
   summary: string;
   matches: MatchEvidence[];
   partialMatches: PartialMatch[];

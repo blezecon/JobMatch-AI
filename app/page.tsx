@@ -6,23 +6,28 @@ import { AiStatusBadge } from "@/components/Badges";
 import { buttonVariants } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/card";
 import { Heading } from "@/components/Feedback";
+import { Sparkles, Cpu, ListChecks, ShieldCheck, Upload, Search } from "lucide-react";
 import type { AiStatus } from "@/types";
 
 const STEPS = [
   {
     title: "Upload your resume",
+    icon: Upload,
     body: "A PDF is parsed in memory. The text never touches a database and the file is discarded when the request ends.",
   },
   {
     title: "Extract a candidate profile",
+    icon: Cpu,
     body: "An open-weight model turns the raw text into skills, experience, projects and education as structured JSON.",
   },
   {
     title: "Search real job listings",
+    icon: ListChecks,
     body: "Six free, key-less public job APIs are queried in parallel and merged into one list.",
   },
   {
     title: "Compare and get it straight",
+    icon: ShieldCheck,
     body: "Matching is deterministic arithmetic over your skills. The model only explains what is already there — it never invents experience.",
   },
 ];
@@ -40,7 +45,8 @@ export default function LandingPage() {
   return (
     <div className="space-y-12">
       <section className="pt-6 text-center">
-        <p className="mb-4 text-sm font-bold uppercase tracking-wide">
+        <p className="mb-4 inline-flex items-center gap-1.5 text-sm font-bold uppercase tracking-wide">
+          <Sparkles aria-hidden className="size-4" />
           Hacktoberfest 2026 · Build for a Friend
         </p>
         <h1 className="mx-auto max-w-3xl font-heading text-4xl font-bold sm:text-6xl">
@@ -52,9 +58,11 @@ export default function LandingPage() {
         </p>
         <div className="mt-8 flex flex-wrap justify-center gap-3">
           <Link href="/resume" className={buttonVariants({ size: "lg" })}>
+            <Upload aria-hidden />
             Upload resume
           </Link>
           <Link href="/jobs" className={buttonVariants({ size: "lg", variant: "neutral" })}>
+            <Search aria-hidden />
             Browse jobs first
           </Link>
         </div>
@@ -68,19 +76,19 @@ export default function LandingPage() {
           How it works
         </h2>
         <ol className="grid gap-4 sm:grid-cols-2">
-          {STEPS.map((step, index) => (
-            <li key={step.title}>
+          {STEPS.map(({ title, icon: Icon, body }) => (
+            <li key={title}>
               <Card className="h-full">
                 <CardHeader>
                   <Heading className="flex items-center gap-2 text-lg">
                     <span className="inline-grid size-7 place-items-center rounded-base border-2 border-border bg-main">
-                      {index + 1}
+                      <Icon aria-hidden className="size-4" />
                     </span>
-                    {step.title}
+                    {title}
                   </Heading>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm">{step.body}</p>
+                  <p className="text-sm">{body}</p>
                 </CardContent>
               </Card>
             </li>

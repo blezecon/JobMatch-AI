@@ -43,7 +43,7 @@ const recordArray = <T extends z.ZodType>(item: T) =>
         .map((result) => result.data),
     );
 
-export const educationSchema = z
+const educationSchema = z
   .object({
     institution: text(),
     degree: text(),
@@ -52,7 +52,7 @@ export const educationSchema = z
   })
   .strip();
 
-export const experienceSchema = z
+const experienceSchema = z
   .object({
     company: text(),
     title: text(),
@@ -61,7 +61,7 @@ export const experienceSchema = z
   })
   .strip();
 
-export const projectSchema = z
+const projectSchema = z
   .object({
     name: text(),
     description: text(),
@@ -70,7 +70,7 @@ export const projectSchema = z
   })
   .strip();
 
-export const certificationSchema = z
+const certificationSchema = z
   .object({
     name: text(),
     issuer: text(),
@@ -122,8 +122,6 @@ export const matchExplanationSchema = z
   })
   .strip();
 
-export type CandidateInput = z.infer<typeof candidateSchema>;
-export type JobRequirementsInput = z.infer<typeof jobRequirementsSchema>;
 export type MatchExplanation = z.infer<typeof matchExplanationSchema>;
 
 /**

@@ -7,16 +7,25 @@ import {
   Empty, EmptyContent, EmptyDescription, EmptyHeader, EmptyTitle,
 } from "@/components/ui/empty";
 import { Skeleton } from "@/components/ui/skeleton";
+import { FileSearch, Loader2, TriangleAlert, type LucideIcon } from "lucide-react";
 import { cn } from "@/lib/utils";
 
 export { Button };
 
-export function LoadingState({ label, detail }: { label: string; detail?: string }) {
+export function LoadingState({
+  label,
+  detail,
+  icon: Icon = Loader2,
+}: {
+  label: string;
+  detail?: string;
+  icon?: LucideIcon;
+}) {
   return (
     <Card role="status" aria-live="polite">
       <CardHeader>
         <Heading className="flex items-center gap-2">
-          <Skeleton className="size-4 rounded-base" />
+          <Icon aria-hidden className="size-4 animate-spin" />
           {label}
         </Heading>
         {detail ? <CardDescription>{detail}</CardDescription> : null}
@@ -42,7 +51,10 @@ export function ErrorState({
 }) {
   return (
     <Alert variant="destructive" role="alert">
-      <AlertTitle>{title}</AlertTitle>
+      <AlertTitle className="flex items-center gap-2">
+        <TriangleAlert aria-hidden className="size-4" />
+        {title}
+      </AlertTitle>
       <AlertDescription>
         <p>{message}</p>
         {hint ? <p className="opacity-80">{hint}</p> : null}
@@ -56,15 +68,20 @@ export function EmptyState({
   title,
   message,
   action,
+  icon: Icon = FileSearch,
 }: {
   title: string;
   message: string;
   action?: React.ReactNode;
+  icon?: LucideIcon;
 }) {
   return (
     <Empty>
       <EmptyHeader>
-        <EmptyTitle>{title}</EmptyTitle>
+        <EmptyTitle className="flex items-center gap-2">
+          <Icon aria-hidden className="size-4" />
+          {title}
+        </EmptyTitle>
         <EmptyDescription>{message}</EmptyDescription>
       </EmptyHeader>
       {action ? <EmptyContent>{action}</EmptyContent> : null}

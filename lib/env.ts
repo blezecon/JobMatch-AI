@@ -1,7 +1,7 @@
 import type { AiStatus } from "@/types";
 import { ApiError } from "./http";
 
-export type AiProvider = "ollama" | "llamacpp" | "groq" | "openrouter";
+type AiProvider = "ollama" | "llamacpp" | "openrouter";
 
 export type AiConfig = {
   provider: AiProvider;
@@ -13,9 +13,9 @@ export type AiConfig = {
 };
 
 /**
- * All four backends speak the OpenAI-compatible `/chat/completions` API, so the
+ * All three backends speak the OpenAI-compatible `/chat/completions` API, so the
  * app only ever talks to one shape. Ollama and llama.cpp server ship it locally;
- * Groq and OpenRouter host the same open-weight models.
+ * OpenRouter hosts the same open-weight models remotely.
  */
 const BACKENDS: Record<
   AiProvider,
@@ -32,12 +32,6 @@ const BACKENDS: Record<
     model: "local-model",
     keyVar: null,
     envPrefix: "LLAMACPP",
-  },
-  groq: {
-    baseUrl: "https://api.groq.com/openai/v1",
-    model: "openai/gpt-oss-20b",
-    keyVar: "GROQ_API_KEY",
-    envPrefix: "GROQ",
   },
   openrouter: {
     baseUrl: "https://openrouter.ai/api/v1",
@@ -62,7 +56,7 @@ function resolve(): { config: AiConfig | null; error: ApiError | null } {
   }
 
   // Every backend honours <PREFIX>_BASE_URL / <PREFIX>_MODEL, so OLLAMA_BASE_URL,
-  // LLAMACPP_BASE_URL, GROQ_BASE_URL and OPENROUTER_BASE_URL all work.
+  // LLAMACPP_BASE_URL and OPENROUTER_BASE_URL all work.
   // AI_BASE_URL / AI_MODEL are the generic overrides and win over both.
   const defaultBaseUrl = process.env[`${backend.envPrefix}_BASE_URL`] ?? backend.baseUrl;
   const defaultModel = process.env[`${backend.envPrefix}_MODEL`] ?? backend.model;

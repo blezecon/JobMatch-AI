@@ -1,10 +1,11 @@
 import Link from "next/link";
+import { FileText, Search, ShieldCheck } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { buttonVariants } from "@/components/ui/button";
 
 const NAV = [
-  { href: "/resume", label: "Resume" },
-  { href: "/jobs", label: "Jobs" },
+  { href: "/resume", label: "Resume", icon: FileText },
+  { href: "/jobs", label: "Jobs", icon: Search },
 ];
 
 export function SiteHeader() {
@@ -19,10 +20,11 @@ export function SiteHeader() {
         </Link>
         <nav aria-label="Main">
           <ul className="flex items-center gap-2">
-            {NAV.map((item) => (
-              <li key={item.href}>
-                <Link href={item.href} className={buttonVariants({ variant: "neutral", size: "sm" })}>
-                  {item.label}
+            {NAV.map(({ href, label, icon: Icon }) => (
+              <li key={href}>
+                <Link href={href} className={buttonVariants({ variant: "neutral", size: "sm" })}>
+                  <Icon aria-hidden />
+                  {label}
                 </Link>
               </li>
             ))}
@@ -37,7 +39,8 @@ export function SiteFooter() {
   return (
     <footer className="mt-auto border-t-2 border-border bg-secondary-background">
       <div className="mx-auto w-full max-w-5xl space-y-1 px-4 py-6 text-sm">
-        <Badge variant="neutral" className="border-2 border-border">
+        <Badge variant="neutral" className="gap-1 border-2 border-border">
+          <ShieldCheck aria-hidden />
           Privacy
         </Badge>
         <p>

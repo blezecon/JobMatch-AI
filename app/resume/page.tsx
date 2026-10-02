@@ -6,6 +6,7 @@ import { Card, CardContent, CardDescription, CardHeader } from "@/components/ui/
 import { CandidateProfile } from "@/components/CandidateProfile";
 import { EmptyState, Heading } from "@/components/Feedback";
 import { ResumeUpload } from "@/components/ResumeUpload";
+import { FileText } from "lucide-react";
 import { useCandidate } from "@/lib/store";
 
 export default function ResumePage() {
@@ -14,7 +15,10 @@ export default function ResumePage() {
   return (
     <div className="space-y-6">
       <div>
-        <h1 className="font-heading text-3xl font-bold">Your resume</h1>
+        <h1 className="flex items-center gap-2 font-heading text-3xl font-bold">
+          <FileText aria-hidden className="size-7" />
+          Your resume
+        </h1>
         <p className="mt-1">
           The extracted profile stays in this browser tab. Uploading a new PDF replaces it.
         </p>

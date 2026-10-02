@@ -13,6 +13,7 @@ import {
 import { Field, FieldLabel } from "@/components/ui/field";
 import { Input } from "@/components/ui/input";
 import { Heading } from "@/components/Feedback";
+import { FileUp, Loader2, CircleCheck, TriangleAlert } from "lucide-react";
 import { saveCandidate } from "@/lib/store";
 import type { CandidateResponse } from "@/types";
 
@@ -67,7 +68,10 @@ export function ResumeUpload() {
   return (
     <Card>
       <CardHeader>
-        <Heading>Upload your resume</Heading>
+        <Heading className="flex items-center gap-2">
+          <FileUp aria-hidden className="size-5" />
+          Upload your resume
+        </Heading>
         <CardDescription>
           PDF only. Parsed in memory, never written to disk.
         </CardDescription>
@@ -81,7 +85,10 @@ export function ResumeUpload() {
           {fileName ? <p className="text-sm">Selected: {fileName}</p> : null}
           {state.status === "uploading" ? (
             <Alert>
-              <AlertTitle>Working on it</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                <Loader2 aria-hidden className="size-4 animate-spin" />
+                Working on it
+              </AlertTitle>
               <AlertDescription>
                 Extracting text and running candidate extraction. Local models can take a minute.
               </AlertDescription>
@@ -89,15 +96,21 @@ export function ResumeUpload() {
           ) : null}
           {state.status === "done" ? (
             <Alert>
-              <AlertTitle>Profile extracted</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                <CircleCheck aria-hidden className="size-4" />
+                Profile extracted
+              </AlertTitle>
               <AlertDescription>
-                <span aria-hidden>✓</span> Your candidate profile is ready below.
+                Your candidate profile is ready below.
               </AlertDescription>
             </Alert>
           ) : null}
           {state.status === "error" ? (
             <Alert variant="destructive" role="alert">
-              <AlertTitle>Resume not processed</AlertTitle>
+              <AlertTitle className="flex items-center gap-2">
+                <TriangleAlert aria-hidden className="size-4" />
+                Resume not processed
+              </AlertTitle>
               <AlertDescription>
                 <p>{state.message}</p>
                 {state.hint ? <p className="opacity-80">{state.hint}</p> : null}
@@ -109,7 +122,17 @@ export function ResumeUpload() {
             down on hover. The 1rem gap keeps them from reading as one block. */}
         <CardFooter className="pt-4">
           <Button type="submit" className="w-full sm:w-auto" disabled={state.status === "uploading"}>
-            {state.status === "uploading" ? "Reading resume…" : "Analyse resume"}
+            {state.status === "uploading" ? (
+              <>
+                <Loader2 aria-hidden className="animate-spin" />
+                Reading resume…
+              </>
+            ) : (
+              <>
+                <FileUp aria-hidden />
+                Analyse resume
+              </>
+            )}
           </Button>
         </CardFooter>
       </form>

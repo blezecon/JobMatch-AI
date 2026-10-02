@@ -83,10 +83,6 @@ export function getJob(jobId: string): Job | null {
   return readSnapshot().jobs.find((job) => job.id === jobId) ?? null;
 }
 
-// Server render and first client render must agree, so the server snapshot is
-// the empty one; the client snapshot fills in on the first commit.
-const serverSnapshot = (): Snapshot => EMPTY;
-
 const subscribeToStore = subscribe;
 const readStore = readSnapshot;
 
@@ -104,8 +100,4 @@ export function useJob(jobId: string): Job | null {
     () => getJob(jobId),
     () => null,
   );
-}
-
-export function useStoreSnapshot(): Snapshot {
-  return useSyncExternalStore(subscribeToStore, readStore, serverSnapshot);
 }

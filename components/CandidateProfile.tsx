@@ -6,6 +6,7 @@ import {
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
+import { Briefcase, FolderGit2, GraduationCap, Lightbulb, Wrench } from "lucide-react";
 import type { Candidate } from "@/types";
 
 function Chips({ items }: { items: string[] }) {
@@ -42,7 +43,8 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
       </div>
 
       <section aria-labelledby="skills-heading">
-        <h3 id="skills-heading" className="mb-2 font-heading font-bold">
+        <h3 id="skills-heading" className="mb-2 flex items-center gap-2 font-heading font-bold">
+          <Wrench aria-hidden className="size-4" />
           Skills
         </h3>
         <Chips items={candidate.skills} />
@@ -50,7 +52,8 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
 
       {experience.length > 0 ? (
         <section aria-labelledby="experience-heading" className="space-y-3">
-          <h3 id="experience-heading" className="font-heading font-bold">
+          <h3 id="experience-heading" className="flex items-center gap-2 font-heading font-bold">
+            <Briefcase aria-hidden className="size-4" />
             Experience
           </h3>
           <ul className="space-y-3">
@@ -82,7 +85,8 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
 
       {projects.length > 0 ? (
         <section aria-labelledby="projects-heading" className="space-y-3">
-          <h3 id="projects-heading" className="font-heading font-bold">
+          <h3 id="projects-heading" className="flex items-center gap-2 font-heading font-bold">
+            <FolderGit2 aria-hidden className="size-4" />
             Projects
           </h3>
           <ul className="space-y-3">
@@ -127,7 +131,8 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
 
       {education.length > 0 ? (
         <section aria-labelledby="education-heading" className="space-y-3">
-          <h3 id="education-heading" className="font-heading font-bold">
+          <h3 id="education-heading" className="flex items-center gap-2 font-heading font-bold">
+            <GraduationCap aria-hidden className="size-4" />
             Education
           </h3>
           <ul className="space-y-2">
@@ -150,7 +155,8 @@ export function CandidateProfile({ candidate }: { candidate: Candidate }) {
 
       {certifications.length > 0 ? (
         <section aria-labelledby="certs-heading" className="space-y-3">
-          <h3 id="certs-heading" className="font-heading font-bold">
+          <h3 id="certs-heading" className="flex items-center gap-2 font-heading font-bold">
+            <Lightbulb aria-hidden className="size-4" />
             Certifications
           </h3>
           <ul className="space-y-2">

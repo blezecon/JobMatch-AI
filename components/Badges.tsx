@@ -1,4 +1,5 @@
 import { Badge } from "@/components/ui/badge";
+import { Cpu, TriangleAlert } from "lucide-react";
 import type { AiStatus } from "@/types";
 
 /**
@@ -32,7 +33,8 @@ export function AiStatusBadge({ status }: { status: AiStatus | null }) {
         className="gap-1 border-2 border-border shadow-shadow bg-chart-3"
         title={status.error ?? undefined}
       >
-        <span aria-hidden>⚠</span> AI not ready — {status.error ?? "backend unreachable"}
+        <TriangleAlert aria-hidden className="size-3" />
+        AI not ready — {status.error ?? "backend unreachable"}
       </Badge>
     );
   }
@@ -41,7 +43,8 @@ export function AiStatusBadge({ status }: { status: AiStatus | null }) {
       variant="neutral"
       className="gap-1 border-2 border-border shadow-shadow bg-secondary-background"
     >
-      <span aria-hidden>◆</span> {status.provider} / {status.model}
+      <Cpu aria-hidden className="size-3" />
+      {status.provider} / {status.model}
       {status.reachable === true ? " · ready" : ""}
     </Badge>
   );
