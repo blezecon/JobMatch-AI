@@ -319,9 +319,9 @@ lib/
 ├── store.ts                     sessionStorage helpers
 └── validation.ts                upload + analyze body guards
 
-test/       matching · jobs · ai · pdf · store · render   (86 tests, no network or model needed)
+test/       matching · jobs · ai · pdf · store · render · analyze-page   (90 tests)
 types/      all shared types
-scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
+scripts/    make-sample-resume.mjs (sample resume.pdf), verify-analyze-page.mjs (live check)
 ```
 
 ## Privacy
