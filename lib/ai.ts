@@ -22,8 +22,21 @@ import {
 /** Bump when a prompt changes, so reports can be traced to the prompt that produced them. */
 export const PROMPT_VERSION = "candidate-v1+requirements-v1+explanation-v1";
 
-/** ponytail: resume text is truncated before prompting; raise if extraction misses late sections. */
-const MAX_RESUME_CHARS = 14_000;
+/**
+ * Roughly 4 characters per token. A local server with a 16k context cannot take
+ * a 14k-char resume and a 12k-char job listing in one prompt, so both are
+ * clipped to leave room for the instructions and the JSON reply.
+ */
+const charsPerToken = 4;
+const PROMPT_BUDGET_TOKENS = Math.max(1024, LIMITS.aiNumCtx - 2048);
+const MAX_RESUME_CHARS = Math.floor(PROMPT_BUDGET_TOKENS * 0.4) * charsPerToken;
+const MAX_JOB_CHARS = Math.floor(PROMPT_BUDGET_TOKENS * 0.45) * charsPerToken;
+
+/** Keeps the head of a listing, which is where the requirements live. */
+function clip(text: string, limit: number): string {
+  if (text.length <= limit) return text;
+  return `${text.slice(0, limit)}\n[listing truncated]`;
+}
 
 const SYSTEM = `You are a precise resume parser for a job-matching tool.
 Return a single JSON object and nothing else. No prose, no markdown fences.
@@ -151,6 +164,12 @@ async function callModel(
         temperature: 0.1,
         max_tokens: maxTokens,
         ...(useJsonMode ? { response_format: { type: "json_object" } } : {}),
+        // Local servers keep a KV cache across requests. A stale cache from the
+        // previous prompt can corrupt the answer and holds context hostage, so
+        // each call gets a fresh window of the size the server was given.
+        ...(cfg.local
+          ? { cache_prompt: false, options: { num_ctx: LIMITS.aiNumCtx } }
+          : {}),
       }),
     });
   } catch (error) {
@@ -231,7 +250,7 @@ function validated<T>(result: { success: true; data: T } | { success: false }, l
 /** Stage 2: resume text -> structured candidate. */
 export async function extractCandidate(resumeText: string): Promise<Candidate> {
   const cfg = requireAiConfig();
-  const clipped = resumeText.slice(0, MAX_RESUME_CHARS);
+  const clipped = clip(resumeText, MAX_RESUME_CHARS);
   const raw = await askJson(
     cfg,
     {
@@ -257,7 +276,7 @@ export async function extractJobRequirements(job: Job): Promise<JobRequirements>
   const cfg = requireAiConfig();
   const prompt = {
     system: `${SYSTEM}\n\n${REQUIREMENTS_CONTRACT}`,
-    user: `Extract the requirements from this job listing.\n\n<job>\nTitle: ${job.title}\nCompany: ${job.company}\nLocation: ${job.location}\n\n${job.description}\n</job>`,
+    user: `Extract the requirements from this job listing.\n\n<job>\nTitle: ${job.title}\nCompany: ${job.company}\nLocation: ${job.location}\n\n${clip(job.description, MAX_JOB_CHARS)}\n</job>`,
   };
   let parsed = validated(
     jobRequirementsSchema.safeParse(await askJson(cfg, prompt, 1536)),
@@ -276,7 +295,7 @@ export async function extractJobRequirements(job: Job): Promise<JobRequirements>
               "Extract the job requirements as JSON. Output the keys requiredSkills, preferredSkills, " +
               "experienceRequirements, educationRequirements and responsibilities. List every technology " +
               "the listing names. Do not stop after the title.",
-            user: `${job.title} at ${job.company}\n\n${job.description}`,
+            user: `${job.title} at ${job.company}\n\n${clip(job.description, MAX_JOB_CHARS)}`,
           },
           1536,
         ),

@@ -141,4 +141,10 @@ export const LIMITS = {
   /** Local CPU inference is slow; cloud backends answer well inside this. */
   aiTimeoutMs: num(process.env.AI_TIMEOUT_MS, 180_000),
   jobTimeoutMs: num(process.env.JOB_TIMEOUT_MS, 12_000),
+  /**
+   * Context window requested from local servers. llama.cpp and Ollama often boot
+   * with 4k-8k; a resume plus a job listing can exceed that, so we ask for a
+   * known size and keep prompts inside it.
+   */
+  aiNumCtx: num(process.env.AI_NUM_CTX, 16384),
 };

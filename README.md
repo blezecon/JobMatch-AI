@@ -185,6 +185,7 @@ The only thing you must set is an AI backend.
 | `LLAMACPP_MODEL` | no | Ignored by `llama-server`; set it anyway for other servers |
 | `GROQ_BASE_URL`, `OPENROUTER_BASE_URL` | no | Same override for the hosted providers |
 | `AI_TIMEOUT_MS` | no | Default `180000`; local CPU inference is slow |
+| `AI_NUM_CTX` | no | Default `16384`; context window requested from local servers |
 | `MAX_RESUME_BYTES` | no | Default 5 MB |
 | `JOB_TIMEOUT_MS` | no | Default 12000 per job provider |
 
@@ -312,7 +313,7 @@ lib/
 ├── store.ts                     sessionStorage helpers
 └── validation.ts                upload + analyze body guards
 
-test/       matching · jobs · ai · pdf      (76 tests, no network or model needed)
+test/       matching · jobs · ai · pdf · store · render   (84 tests, no network or model needed)
 types/      all shared types
 scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
 ```
@@ -346,7 +347,10 @@ scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
 - **A listing with 20-plus preferred skills gives a low percentage.** The score is raw coverage, so
   matching 1 of 23 nice-to-haves reads as 4% even when the stack fits. The absolute number means less
   than the lists next to it.
-- **Resume text is truncated** at 14,000 characters before prompting, to bound inference cost.
+- **Prompts are clipped to the context window.** Local servers usually boot with a 4k-16k context, so
+  the resume and the job listing are truncated to fit `AI_NUM_CTX` (default 16384) and every local call
+  asks for a fresh context (`cache_prompt: false`) rather than reusing a stale KV cache. Raise
+  `AI_NUM_CTX` if your server was started with more.
 - **Job coverage skews remote and European.** All four sources are free and key-less; none has strong
   India/Kolkata city-level coverage.
 - **Attribution obligations.** RemoteOK and Jobicy require source credit, which the UI provides.

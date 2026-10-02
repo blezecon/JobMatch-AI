@@ -11,14 +11,19 @@ function Item({ label, value }: { label: string; value: string }) {
 }
 
 function Chips({ items }: { items: string[] }) {
-  if (items.length === 0) {
+  // A model can list the same skill twice ("Python", "python"); duplicate React
+  // keys are a real error, and a repeated chip tells the user nothing anyway.
+  const unique = [...new Map(items.map((item) => [item.trim().toLowerCase(), item.trim()])).values()].filter(
+    Boolean,
+  );
+  if (unique.length === 0) {
     return <p className="text-sm text-slate-500">None found.</p>;
   }
   return (
     <ul className="flex flex-wrap gap-1.5">
-      {items.map((item) => (
+      {unique.map((item, index) => (
         <li
-          key={item}
+          key={`${item}-${index}`}
           className="rounded-full border border-slate-300 px-2.5 py-1 text-xs dark:border-slate-700"
         >
           {item}
