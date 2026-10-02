@@ -135,8 +135,9 @@ An open-weight model is not a checkbox here — it is what makes the product pos
   which is a good trade for a tool you run on your own data.
 
 **Verified end to end** with `gemma3:4b` on Ollama (fully local, ~50 s to extract the profile,
-~3 min per full analysis on CPU) and `google/gemma-3-27b-it` on OpenRouter (~7 s to extract,
-~12–40 s per analysis). Gemma is the default everywhere it is available; on a Groq account
+~3 min per full analysis on CPU), `google/gemma-3-27b-it` on OpenRouter (~7 s to extract,
+~12–40 s per analysis), and `phi4.gguf` on llama.cpp over the LAN (~4 s to extract,
+~16 s per analysis). Gemma is the default everywhere it is available; on a Groq account
 that does not host Gemma, the default falls back to `openai/gpt-oss-20b`.
 
 No claim of "100% accuracy" is made here. Small models misread resumes and mis-extract requirements.
@@ -180,6 +181,9 @@ The only thing you must set is an AI backend.
 | `AI_MODEL` | no | Override the default model |
 | `OLLAMA_BASE_URL` | no | Default `http://localhost:11434/v1` |
 | `OLLAMA_MODEL` | no | Default `gemma3:4b` |
+| `LLAMACPP_BASE_URL` | no | Default `http://localhost:8080/v1` |
+| `LLAMACPP_MODEL` | no | Ignored by `llama-server`; set it anyway for other servers |
+| `GROQ_BASE_URL`, `OPENROUTER_BASE_URL` | no | Same override for the hosted providers |
 | `AI_TIMEOUT_MS` | no | Default `180000`; local CPU inference is slow |
 | `MAX_RESUME_BYTES` | no | Default 5 MB |
 | `JOB_TIMEOUT_MS` | no | Default 12000 per job provider |
@@ -225,13 +229,17 @@ https://console.groq.com/settings/limits. The app reports this as
 ### Option D — llama.cpp
 
 ```bash
-llama-server -m gemma-3-4b-it-q4_k_m.gguf --port 8080
+llama-server -m phi4.gguf --host 0.0.0.0 --port 8080
 ```
 
 ```bash
 AI_PROVIDER=llamacpp
-AI_MODEL=<your-gguf-name>
+LLAMACPP_BASE_URL=http://localhost:8080/v1
 ```
+
+`llama-server` serves whichever GGUF it was started with and ignores the `model` field, so
+`AI_MODEL` can be left unset. Point `LLAMACPP_BASE_URL` at your LAN address to use a model running on
+another machine.
 
 Then:
 
@@ -304,7 +312,7 @@ lib/
 ├── store.ts                     sessionStorage helpers
 └── validation.ts                upload + analyze body guards
 
-test/       matching · jobs · ai · pdf      (73 tests, no network or model needed)
+test/       matching · jobs · ai · pdf      (76 tests, no network or model needed)
 types/      all shared types
 scripts/    make-sample-resume.mjs + the sample resume.pdf the PDF tests use
 ```

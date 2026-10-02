@@ -356,6 +356,46 @@ it("rejects an unsupported backend name", () => {
   }
 });
 
+it("honours a per-backend BASE_URL for every provider", () => {
+  // Regression: LLAMACPP_BASE_URL was documented but never read, so a remote
+  // llama-server was silently ignored in favour of the localhost default.
+  const original = { ...process.env };
+  process.env = { ...original, AI_PROVIDER: "llamacpp", LLAMACPP_BASE_URL: "http://192.168.29.136:8080/v1" };
+  delete process.env.AI_BASE_URL;
+  try {
+    expect(requireAiConfig().baseUrl).toBe("http://192.168.29.136:8080/v1");
+  } finally {
+    process.env = original;
+  }
+});
+
+it("honours a per-backend MODEL for every provider", () => {
+  const original = { ...process.env };
+  process.env = { ...original, AI_PROVIDER: "llamacpp", LLAMACPP_MODEL: "phi4.gguf" };
+  delete process.env.AI_MODEL;
+  try {
+    expect(requireAiConfig().model).toBe("phi4.gguf");
+  } finally {
+    process.env = original;
+  }
+});
+
+it("lets AI_BASE_URL win over the per-backend variable", () => {
+  const original = { ...process.env };
+  process.env = {
+    ...original,
+    AI_PROVIDER: "llamacpp",
+    LLAMACPP_BASE_URL: "http://per-backend:8080/v1",
+    AI_BASE_URL: "http://generic:9000/v1/",
+  };
+  try {
+    // Trailing slashes are stripped so the composed path never doubles up.
+    expect(requireAiConfig().baseUrl).toBe("http://generic:9000/v1");
+  } finally {
+    process.env = original;
+  }
+});
+
 it("marks local backends as local so the UI can say the resume stays put", () => {
   const original = { ...process.env };
   process.env.AI_PROVIDER = "ollama";

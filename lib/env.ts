@@ -17,14 +17,33 @@ export type AiConfig = {
  * app only ever talks to one shape. Ollama and llama.cpp server ship it locally;
  * Groq and OpenRouter host the same open-weight models.
  */
-const BACKENDS: Record<AiProvider, { baseUrl: string; model: string; keyVar: string | null }> = {
-  ollama: { baseUrl: "http://localhost:11434/v1", model: "gemma3:4b", keyVar: null },
-  llamacpp: { baseUrl: "http://localhost:8080/v1", model: "local-model", keyVar: null },
-  groq: { baseUrl: "https://api.groq.com/openai/v1", model: "openai/gpt-oss-20b", keyVar: "GROQ_API_KEY" },
+const BACKENDS: Record<
+  AiProvider,
+  { baseUrl: string; model: string; keyVar: string | null; envPrefix: string }
+> = {
+  ollama: {
+    baseUrl: "http://localhost:11434/v1",
+    model: "gemma3:4b",
+    keyVar: null,
+    envPrefix: "OLLAMA",
+  },
+  llamacpp: {
+    baseUrl: "http://localhost:8080/v1",
+    model: "local-model",
+    keyVar: null,
+    envPrefix: "LLAMACPP",
+  },
+  groq: {
+    baseUrl: "https://api.groq.com/openai/v1",
+    model: "openai/gpt-oss-20b",
+    keyVar: "GROQ_API_KEY",
+    envPrefix: "GROQ",
+  },
   openrouter: {
     baseUrl: "https://openrouter.ai/api/v1",
     model: "google/gemma-3-27b-it",
     keyVar: "OPENROUTER_API_KEY",
+    envPrefix: "OPENROUTER",
   },
 };
 
@@ -42,11 +61,11 @@ function resolve(): { config: AiConfig | null; error: ApiError | null } {
     };
   }
 
-  // OLLAMA_* keeps its conventional name; AI_BASE_URL / AI_MODEL override anything.
-  const defaultBaseUrl =
-    requested === "ollama" ? (process.env.OLLAMA_BASE_URL ?? backend.baseUrl) : backend.baseUrl;
-  const defaultModel =
-    requested === "ollama" ? (process.env.OLLAMA_MODEL ?? backend.model) : backend.model;
+  // Every backend honours <PREFIX>_BASE_URL / <PREFIX>_MODEL, so OLLAMA_BASE_URL,
+  // LLAMACPP_BASE_URL, GROQ_BASE_URL and OPENROUTER_BASE_URL all work.
+  // AI_BASE_URL / AI_MODEL are the generic overrides and win over both.
+  const defaultBaseUrl = process.env[`${backend.envPrefix}_BASE_URL`] ?? backend.baseUrl;
+  const defaultModel = process.env[`${backend.envPrefix}_MODEL`] ?? backend.model;
 
   const baseUrl = (process.env.AI_BASE_URL ?? defaultBaseUrl).replace(/\/+$/, "");
   const model = (process.env.AI_MODEL ?? defaultModel).trim();
