@@ -1,5 +1,5 @@
 import { probeAi } from "@/lib/ai";
-import { describeAi } from "@/lib/env";
+import { AI_BACKENDS, describeAi } from "@/lib/env";
 import { PROVIDERS } from "@/lib/jobs";
 
 export const runtime = "nodejs";
@@ -14,5 +14,6 @@ export async function GET(request: Request) {
   return Response.json({
     ai: probe ? { ...status, ...probe } : status,
     providers: providerLabels(),
+    backends: AI_BACKENDS,
   });
 }

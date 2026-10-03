@@ -101,6 +101,9 @@ export function requireAiConfig(): AiConfig {
   return config;
 }
 
+/** Every backend the app supports, in display order. */
+export const AI_BACKENDS: AiProvider[] = Object.keys(BACKENDS) as AiProvider[];
+
 /** Config for status display: never throws, so the UI can explain what is missing. */
 export function describeAi(): AiStatus {
   const { config, error } = resolve();

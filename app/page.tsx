@@ -18,7 +18,7 @@ import {
   Upload,
   Search,
 } from "lucide-react";
-import type { AiStatus } from "@/types";
+import type { StatusResponse } from "@/types";
 
 const STEPS = [
   {
@@ -44,12 +44,16 @@ const STEPS = [
 ];
 
 export default function LandingPage() {
-  const [status, setStatus] = useState<AiStatus | null>(null);
+  const [status, setStatus] = useState<StatusResponse["ai"] | null>(null);
+  const [backends, setBackends] = useState<string[]>([]);
 
   useEffect(() => {
     fetch("/api/status")
       .then((response) => response.json())
-      .then((payload: { ai: AiStatus }) => setStatus(payload.ai))
+      .then((payload: StatusResponse) => {
+        setStatus(payload.ai);
+        setBackends(payload.backends ?? []);
+      })
       .catch(() => setStatus(null));
   }, []);
 
@@ -81,7 +85,7 @@ export default function LandingPage() {
           </Link>
         </div>
         <p className="mt-6 flex justify-center">
-          <AiStatusBadge status={status} />
+          <AiStatusBadge status={status} backends={backends} />
         </p>
       </section>
 

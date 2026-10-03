@@ -1,5 +1,5 @@
 import { Badge } from "@/components/ui/badge";
-import { Cpu, TriangleAlert } from "lucide-react";
+import { Bot, TriangleAlert } from "lucide-react";
 import type { AiStatus } from "@/types";
 
 /**
@@ -24,8 +24,18 @@ export function LevelBadge({ level }: { level: MatchLevel }) {
   );
 }
 
-export function AiStatusBadge({ status }: { status: AiStatus | null }) {
+export function AiStatusBadge({
+  status,
+  backends = [],
+}: {
+  status: AiStatus | null;
+  /** Every backend the app supports; the active one and model are in the tooltip. */
+  backends?: string[];
+}) {
   if (!status) return <span className="text-sm">Checking AI backend…</span>;
+
+  const label = backends.length > 0 ? backends.join(" / ") : status.provider;
+
   if (!status.configured || status.reachable === false) {
     return (
       <Badge
@@ -34,7 +44,7 @@ export function AiStatusBadge({ status }: { status: AiStatus | null }) {
         title={status.error ?? undefined}
       >
         <TriangleAlert aria-hidden className="size-3" />
-        AI not ready — {status.error ?? "backend unreachable"}
+        {label} — not ready: {status.error ?? "backend unreachable"}
       </Badge>
     );
   }
@@ -42,9 +52,10 @@ export function AiStatusBadge({ status }: { status: AiStatus | null }) {
     <Badge
       variant="neutral"
       className="gap-1 border-2 border-border shadow-shadow bg-secondary-background"
+      title={`Active: ${status.provider} / ${status.model}`}
     >
-      <Cpu aria-hidden className="size-3" />
-      {status.provider} / {status.model}
+      <Bot aria-hidden className="size-10" />
+      {label}
       {status.reachable === true ? " · ready" : ""}
     </Badge>
   );

@@ -126,6 +126,14 @@ export type AiStatus = {
   error: string | null;
 };
 
+export type StatusResponse = {
+  ai: AiStatus;
+  /** Job feeds being queried. */
+  providers: string[];
+  /** AI backends the app supports, e.g. ["ollama", "llamacpp", "openrouter"]. */
+  backends: string[];
+};
+
 export type CandidateResponse = {
   candidate: Candidate;
   meta: {
