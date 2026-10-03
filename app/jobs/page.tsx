@@ -2,7 +2,7 @@ import { Suspense } from "react";
 import { JobSearch } from "@/components/JobSearch";
 import { LoadingState } from "@/components/Feedback";
 
-export const metadata = { title: "Job search — JobMatch AI" };
+export const metadata = { title: "Job search — DevOrbit" };
 
 export default function JobsPage() {
   return (

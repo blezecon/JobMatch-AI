@@ -12,7 +12,6 @@ import {
 } from "@/components/ui/card";
 import { Heading } from "@/components/Feedback";
 import {
-  Sparkles,
   Cpu,
   ListChecks,
   ShieldCheck,
@@ -64,7 +63,7 @@ export default function LandingPage() {
           Understand which jobs actually fit your resume.
         </h1>
         <p className="mx-auto mt-6 max-w-2xl text-lg">
-          JobMatch AI reads your resume, searches real listings, and tells you
+          DevOrbit reads your resume, searches real listings, and tells you
           plainly what you match, what you only half-match, and what is missing.
           No black-box score, no invented experience.
         </p>

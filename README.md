@@ -1,4 +1,4 @@
-# JobMatch AI
+# DevOrbit
 
 Understand which jobs actually fit your resume.
 
@@ -19,7 +19,7 @@ you add experience you do not have.
 
 ## Solution
 
-JobMatch AI reads both documents with an open-weight model, puts them in the same structured
+DevOrbit reads both documents with an open-weight model, puts them in the same structured
 vocabulary, and then compares them with plain code:
 
 - **Matches** — requirements your resume already satisfies
@@ -160,8 +160,8 @@ state-management library.
 ## Setup
 
 ```bash
-git clone <your-fork-url> jobmatch-ai
-cd jobmatch-ai
+git clone <your-fork-url> devorbit
+cd devorbit
 npm install
 cp .env.example .env.local
 ```
@@ -383,6 +383,4 @@ npm run dev
 
 ## License
 
-MIT.# JobMatch-AI
-# JobMatch-AI
-# JobMatch-AI
+MIT. See [LICENSE](LICENSE).

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { Cpu, FileText, Search, ShieldCheck } from "lucide-react";
+import { Cpu, FileText, Orbit, Search, ShieldCheck } from "lucide-react";
 import { buttonVariants } from "@/components/ui/button";
 import { PROVIDERS } from "@/lib/jobs";
 
@@ -8,15 +8,20 @@ const NAV = [
   { href: "/jobs", label: "Jobs", icon: Search },
 ];
 
+/** The brand mark, sized by the caller. Decorative: the name always sits beside it. */
+export function Logo({ className = "size-6" }: { className?: string }) {
+  return <Orbit aria-hidden className={className} />;
+}
+
 export function SiteHeader() {
   return (
     <header className="border-b-2 border-border bg-background">
       <div className="mx-auto flex h-16 w-full max-w-5xl items-center justify-between px-4">
         <Link href="/" className="flex items-center gap-2 font-heading text-lg font-bold">
-          <span className="grid size-8 place-items-center rounded-base border-2 border-border bg-main text-sm font-bold shadow-shadow">
-            JM
+          <span className="grid size-9 place-items-center rounded-base border-2 border-border bg-main text-white shadow-shadow">
+            <Logo className="size-5" />
           </span>
-          JobMatch AI
+          DevOrbit
         </Link>
         <nav aria-label="Main">
           <ul className="flex items-center gap-2">
@@ -42,13 +47,10 @@ export function SiteFooter() {
         <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-3">
           <div className="space-y-2">
             <p className="flex items-center gap-2 font-heading text-lg font-bold">
-              <span
-                aria-hidden
-                className="grid size-7 place-items-center rounded-base border-2 border-border bg-main text-xs font-bold"
-              >
-                JM
+              <span className="grid size-8 place-items-center rounded-base border-2 border-border bg-main text-white">
+                <Logo className="size-4" />
               </span>
-              JobMatch AI
+              DevOrbit
             </p>
             <p className="text-sm">
               Understand which jobs actually fit your resume. Built for Hacktoberfest 2026 — Build

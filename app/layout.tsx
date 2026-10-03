@@ -7,7 +7,7 @@ const geistSans = Geist({ variable: "--font-geist-sans", subsets: ["latin"] });
 const geistMono = Geist_Mono({ variable: "--font-geist-mono", subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "JobMatch AI — understand which jobs actually fit your resume",
+  title: "DevOrbit — understand which jobs actually fit your resume",
   description:
     "Upload a resume, search real job listings, and see exactly which requirements you match, partially match, or are missing. Open-weight model inference, no database.",
 };

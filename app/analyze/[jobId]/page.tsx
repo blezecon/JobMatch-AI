@@ -1,6 +1,6 @@
 import { MatchReport } from "@/components/MatchReport";
 
-export const metadata = { title: "Match analysis — JobMatch AI" };
+export const metadata = { title: "Match analysis — DevOrbit" };
 
 export default async function AnalyzePage({
   params,

@@ -45,7 +45,7 @@ export const remoteok: JobProvider = {
   async search({ query, location, mode }: JobQuery) {
     const payload = await fetchJson<(RemoteOkJob | { legal?: string })[]>(
       "https://remoteok.com/api",
-      { headers: { "user-agent": "JobMatchAI/0.1 (+https://github.com/hacktoberfest-jobmatch)" } },
+      { headers: { "user-agent": "DevOrbit/1.0 (+https://github.com/blezecon/JobMatch-AI)" } },
       Math.max(LIMITS.jobTimeoutMs, 30_000),
     );
     const terms = queryTerms(query);
